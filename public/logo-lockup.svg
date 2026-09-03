@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 700" width="100%" height="100%">
+  <defs>
+    <linearGradient id="savanaGrad2" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#192A45" />
+      <stop offset="50%" stop-color="#1E4554" />
+      <stop offset="100%" stop-color="#288377" />
+    </linearGradient>
+  </defs>
+  <g id="Logo-Mark" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M 400 535 L 310 483 L 310 455 L 400 507 L 490 455 L 490 483 Z" fill="#1C2E4A" />
+    <path d="M 310 420 L 400 472 L 400 488 L 310 436 Z" fill="#203657" />
+    <path d="M 310 380 L 400 432 L 400 448 L 310 396 Z" fill="#254066" />
+    <path d="M 310 340 L 400 392 L 400 408 L 310 356 Z" fill="#2D4D7A" />
+    <path d="M 400 507 L 400 392 L 442 368 L 442 483 Z" fill="#162338" opacity="0.95" />
+    <path d="M 400 200 
+             L 485 249 
+             L 440 275 
+             L 395 249 
+             C 345 278, 335 345, 385 374 
+             L 450 411 
+             C 505 443, 495 525, 435 555 
+             L 400 535 
+             C 445 510, 450 460, 410 436 
+             L 350 401 
+             C 290 366, 295 260, 400 200 Z" 
+          fill="url(#savanaGrad2)" />
+    <path d="M 425 245 
+             L 470 271 
+             C 410 306, 360 310, 360 355 
+             C 360 385, 390 402, 420 420 
+             L 445 435 
+             C 475 452, 475 480, 445 498 
+             L 425 486 
+             C 445 473, 445 460, 425 448 
+             L 400 433 
+             C 360 410, 335 385, 335 345 
+             C 335 295, 380 270, 425 245 Z" 
+          fill="#1C2E4A" opacity="0.3" />
+    <path d="M 400 200 L 400 225 L 350 254 L 350 229 Z" fill="#254066" />
+    <path d="M 400 200 L 485 249 L 460 263 L 400 228 Z" fill="#288377" />
+  </g>
+  <text x="400" y="640" text-anchor="middle" font-family="Arial, sans-serif" font-size="64" font-weight="800" letter-spacing="4">
+    <tspan fill="#1C2E4A">SAVANA</tspan><tspan fill="#288377">3D</tspan>
+  </text>
+</svg>
