@@ -11,7 +11,7 @@ export default function Home() {
       <div className="text-center py-16">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/logo-lockup.svg"
+          src="/logo-lockup.png"
           alt="Savana3D"
           className="h-40 mx-auto mb-8"
         />
