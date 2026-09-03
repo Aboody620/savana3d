@@ -17,7 +17,7 @@ export default function Navbar() {
       <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2 font-bold text-lg">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo.svg" alt="Savana3D" className="h-9 w-9" />
+          <img src="/logo.png" alt="Savana3D" className="h-9 w-9 object-contain" />
           Savana3D
         </Link>
 
