@@ -13,7 +13,7 @@ const STATUS_LABELS = {
 };
 
 export default function Dashboard() {
-  const { user, profile, loading: authLoading } = useAuth();
+  const { user, profile, loading: authLoading, profileError } = useAuth();
   const [orders, setOrders] = useState([]);
   const [designs, setDesigns] = useState([]);
   const [loadingData, setLoadingData] = useState(true);
@@ -93,8 +93,22 @@ export default function Dashboard() {
     updateStatus(orderId, "shipped", { tracking_number: trackingNumber });
   }
 
-  if (authLoading || loadingData) return <p className="text-center">جاري التحميل...</p>;
+  if (authLoading) return <p className="text-center">جاري التحميل...</p>;
   if (!user) return <p className="text-center text-gray-600">سجّل الدخول عشان تشوف لوحتك.</p>;
+  if (!profile) {
+    return (
+      <div className="text-center space-y-3">
+        <p className="text-red-600">تعذر تحميل بيانات حسابك{profileError ? `: ${profileError}` : ""}.</p>
+        <button
+          onClick={() => window.location.reload()}
+          className="bg-navy text-white text-sm px-4 py-2 rounded-lg"
+        >
+          إعادة المحاولة
+        </button>
+      </div>
+    );
+  }
+  if (loadingData) return <p className="text-center">جاري التحميل...</p>;
 
   return (
     <div>
