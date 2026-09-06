@@ -85,37 +85,40 @@ export default function Navbar() {
 
   return (
     <nav className="bg-navy text-white shadow-md relative">
-      <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2 font-bold text-lg">
+      <div className="max-w-5xl mx-auto px-3 sm:px-4 py-3 flex items-center gap-2">
+        <Link href="/" className="flex items-center gap-2 font-bold text-base sm:text-lg flex-shrink-0 whitespace-nowrap">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo.png" alt="Savana3D" className="h-9 w-9 object-contain" />
-          Savana3D
+          <img src="/logo.png" alt="Savana3D" className="h-8 w-8 sm:h-9 sm:w-9 object-contain flex-shrink-0" />
+          <span className="hidden xs:inline">Savana3D</span>
         </Link>
 
-        <div className="flex items-center gap-4 text-sm">
-          <Link href="/store" className="hover:text-gold">
+        <div
+          className="flex items-center gap-3 text-xs sm:text-sm flex-1 min-w-0 overflow-x-auto"
+          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+        >
+          <Link href="/store" className="hover:text-gold whitespace-nowrap flex-shrink-0">
             {t("nav_store")}
           </Link>
 
           {user && profile?.role === "designer" && (
-            <Link href="/upload" className="hover:text-gold">
+            <Link href="/upload" className="hover:text-gold whitespace-nowrap flex-shrink-0">
               {t("nav_upload")}
             </Link>
           )}
 
           {user && profile?.role === "customer" && (
-            <Link href="/custom-order" className="hover:text-gold">
+            <Link href="/custom-order" className="hover:text-gold whitespace-nowrap flex-shrink-0">
               {t("nav_custom_order")}
             </Link>
           )}
 
           {user && (
-            <Link href="/dashboard" className="hover:text-gold">
+            <Link href="/dashboard" className="hover:text-gold whitespace-nowrap flex-shrink-0">
               {t("nav_dashboard")}
             </Link>
           )}
 
-          <Link href="/cart" className="relative hover:text-gold" aria-label={t("nav_cart")}>
+          <Link href="/cart" className="relative hover:text-gold flex-shrink-0" aria-label={t("nav_cart")}>
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <circle cx="9" cy="21" r="1.5" fill="currentColor" stroke="none" />
               <circle cx="19" cy="21" r="1.5" fill="currentColor" stroke="none" />
@@ -128,18 +131,21 @@ export default function Navbar() {
             )}
           </Link>
 
+          {!user && (
+            <Link href="/login" className="hover:text-gold whitespace-nowrap flex-shrink-0">
+              {t("nav_login")}
+            </Link>
+          )}
+        </div>
+
+        <div className="flex-shrink-0">
           {!user ? (
-            <>
-              <Link href="/login" className="hover:text-gold">
-                {t("nav_login")}
-              </Link>
-              <Link
-                href="/signup"
-                className="bg-teal px-3 py-1.5 rounded-md hover:opacity-90"
-              >
-                {t("nav_signup")}
-              </Link>
-            </>
+            <Link
+              href="/signup"
+              className="bg-teal px-3 py-1.5 rounded-md hover:opacity-90 text-xs sm:text-sm whitespace-nowrap"
+            >
+              {t("nav_signup")}
+            </Link>
           ) : (
             <div className="relative" ref={menuRef}>
               <button
