@@ -3,10 +3,14 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import { supabase } from "../../lib/supabaseClient";
 import { addToCart } from "../../lib/cart";
+import { useLanguage } from "../../lib/LanguageContext";
+import { getT } from "../../lib/translations";
 
 export default function DesignDetail() {
   const router = useRouter();
   const { id } = router.query;
+  const { lang, dir } = useLanguage();
+  const t = getT(lang);
 
   const [design, setDesign] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -31,8 +35,8 @@ export default function DesignDetail() {
     setAdded(true);
   }
 
-  if (loading) return <p className="text-center">جاري التحميل...</p>;
-  if (!design) return <p className="text-center">التصميم غير موجود.</p>;
+  if (loading) return <p className="text-center">{t("detail_loading")}</p>;
+  if (!design) return <p className="text-center">{t("detail_not_found")}</p>;
 
   return (
     <div className="max-w-2xl mx-auto">
@@ -40,8 +44,8 @@ export default function DesignDetail() {
         href="/store"
         className="inline-flex items-center gap-1 text-navy text-sm font-medium mb-4 hover:opacity-70"
       >
-        <span>→</span>
-        <span>الرجوع لكل التصاميم</span>
+        <span>{dir === "rtl" ? "→" : "←"}</span>
+        <span>{t("detail_back")}</span>
       </Link>
 
       <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
@@ -55,7 +59,7 @@ export default function DesignDetail() {
             />
           ) : (
             <div className="h-full w-full flex items-center justify-center text-gray-300">
-              لا توجد معاينة
+              {t("store_no_preview")}
             </div>
           )}
         </div>
@@ -65,8 +69,8 @@ export default function DesignDetail() {
           <p className="text-gray-600 mb-6">{design.description}</p>
 
           <div className="flex items-center justify-between mb-6">
-            <span className="text-gray-500 text-sm">سعر التصميم/الطباعة</span>
-            <span className="text-2xl font-bold text-teal">{design.price} ريال</span>
+            <span className="text-gray-500 text-sm">{t("detail_price_label")}</span>
+            <span className="text-2xl font-bold text-teal">{design.price} {t("riyal")}</span>
           </div>
 
           {!added ? (
@@ -74,25 +78,25 @@ export default function DesignDetail() {
               onClick={handleAddToCart}
               className="w-full bg-navy text-white py-3 rounded-xl font-bold hover:opacity-90 transition"
             >
-              أضف للسلة
+              {t("store_add_to_cart")}
             </button>
           ) : (
             <div className="space-y-3">
               <div className="bg-teal/10 text-teal text-center py-3 rounded-xl font-bold">
-                أُضيف للسلة ✓
+                {t("detail_added")}
               </div>
               <div className="flex gap-3">
                 <Link
                   href="/cart"
                   className="flex-1 text-center bg-teal text-white py-3 rounded-xl font-bold hover:opacity-90 transition"
                 >
-                  اذهب للسلة والدفع
+                  {t("detail_go_to_cart")}
                 </Link>
                 <Link
                   href="/store"
                   className="flex-1 text-center bg-gray-100 text-navy py-3 rounded-xl font-bold hover:bg-gray-200 transition"
                 >
-                  كمّل التسوق
+                  {t("detail_continue_shopping")}
                 </Link>
               </div>
             </div>
