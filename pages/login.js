@@ -1,9 +1,13 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
 import { supabase } from "../lib/supabaseClient";
+import { useLanguage } from "../lib/LanguageContext";
+import { getT } from "../lib/translations";
 
 export default function Login() {
   const router = useRouter();
+  const { lang } = useLanguage();
+  const t = getT(lang);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -22,7 +26,7 @@ export default function Login() {
     setLoading(false);
 
     if (loginError) {
-      setError("البريد الإلكتروني أو كلمة المرور غير صحيحة");
+      setError(t("login_error"));
       return;
     }
 
@@ -31,11 +35,11 @@ export default function Login() {
 
   return (
     <div className="max-w-md mx-auto bg-white p-8 rounded-xl shadow-sm">
-      <h1 className="text-2xl font-bold text-navy mb-6">تسجيل الدخول</h1>
+      <h1 className="text-2xl font-bold text-navy mb-6">{t("login_title")}</h1>
 
       <form onSubmit={handleLogin} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium mb-1">البريد الإلكتروني</label>
+          <label className="block text-sm font-medium mb-1">{t("login_email")}</label>
           <input
             type="email"
             required
@@ -46,7 +50,7 @@ export default function Login() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1">كلمة المرور</label>
+          <label className="block text-sm font-medium mb-1">{t("login_password")}</label>
           <input
             type="password"
             required
@@ -63,7 +67,7 @@ export default function Login() {
           disabled={loading}
           className="w-full bg-navy text-white py-2.5 rounded-lg font-bold hover:opacity-90 disabled:opacity-50"
         >
-          {loading ? "جاري الدخول..." : "دخول"}
+          {loading ? t("login_loading") : t("login_submit")}
         </button>
       </form>
     </div>
