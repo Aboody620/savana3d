@@ -2,8 +2,12 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { supabase } from "../../lib/supabaseClient";
 import { addToCart } from "../../lib/cart";
+import { useLanguage } from "../../lib/LanguageContext";
+import { getT } from "../../lib/translations";
 
 export default function Store() {
+  const { lang } = useLanguage();
+  const t = getT(lang);
   const [designs, setDesigns] = useState([]);
   const [loading, setLoading] = useState(true);
   const [addedId, setAddedId] = useState(null);
@@ -48,13 +52,13 @@ export default function Store() {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-navy mb-2">متجر التصاميم</h1>
-        <p className="text-gray-500">اختر تصميمًا جاهزًا واطلب طباعته، يوصلك من أقرب شبكة طابعين لدينا.</p>
+        <h1 className="text-3xl font-bold text-navy mb-2">{t("store_title")}</h1>
+        <p className="text-gray-500">{t("store_subtitle")}</p>
       </div>
 
       {designs.length === 0 ? (
         <div className="text-center py-20 bg-white rounded-2xl shadow-sm">
-          <p className="text-gray-500">لا توجد تصاميم منشورة حتى الآن.</p>
+          <p className="text-gray-500">{t("store_empty")}</p>
         </div>
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
@@ -74,7 +78,7 @@ export default function Store() {
                   />
                 ) : (
                   <div className="h-full w-full flex items-center justify-center text-gray-300 text-sm">
-                    لا توجد معاينة
+                    {t("store_no_preview")}
                   </div>
                 )}
               </div>
@@ -82,7 +86,7 @@ export default function Store() {
                 <h3 className="font-bold text-navy text-sm md:text-base leading-snug line-clamp-2 mb-1">
                   {d.title}
                 </h3>
-                <p className="text-teal font-bold text-sm md:text-base mb-3">{d.price} ريال</p>
+                <p className="text-teal font-bold text-sm md:text-base mb-3">{d.price} {t("riyal")}</p>
                 <button
                   onClick={(e) => handleAdd(e, d)}
                   className={`mt-auto w-full text-xs md:text-sm font-bold py-2 rounded-lg transition-colors ${
@@ -91,7 +95,7 @@ export default function Store() {
                       : "bg-navy/5 text-navy hover:bg-navy hover:text-white"
                   }`}
                 >
-                  {addedId === d.id ? "أُضيف ✓" : "أضف للسلة"}
+                  {addedId === d.id ? t("store_added") : t("store_add_to_cart")}
                 </button>
               </div>
             </Link>
