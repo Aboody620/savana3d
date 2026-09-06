@@ -101,7 +101,7 @@ export default function Navbar() {
 
           {user && (
             <Link href="/dashboard" className="hover:text-gold">
-              لوحتي
+              تصاميمي
             </Link>
           )}
 
