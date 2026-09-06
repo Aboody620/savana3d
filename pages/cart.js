@@ -6,12 +6,16 @@ import Head from "next/head";
 import { supabase } from "../lib/supabaseClient";
 import { useAuth } from "../lib/useAuth";
 import { getCart, removeFromCart, updateQuantity, getCartSubtotal } from "../lib/cart";
+import { useLanguage } from "../lib/LanguageContext";
+import { getT } from "../lib/translations";
 
 const SHIPPING_COST = 25; // تكلفة شحن ثابتة للسلة كاملة بالمرحلة الأولى
 
 export default function Cart() {
   const router = useRouter();
   const { user } = useAuth();
+  const { lang } = useLanguage();
+  const t = getT(lang);
 
   const [items, setItems] = useState([]);
   const [showShippingForm, setShowShippingForm] = useState(false);
@@ -104,12 +108,12 @@ export default function Cart() {
   if (items.length === 0 && !activeCheckout) {
     return (
       <div className="max-w-lg mx-auto text-center bg-white rounded-2xl shadow-sm p-10">
-        <p className="text-gray-500 mb-6">سلتك فاضية حاليًا.</p>
+        <p className="text-gray-500 mb-6">{t("cart_empty")}</p>
         <Link
           href="/store"
           className="inline-block bg-navy text-white px-6 py-3 rounded-xl font-bold hover:opacity-90"
         >
-          تصفّح المتجر
+          {t("cart_browse_store")}
         </Link>
       </div>
     );
@@ -123,7 +127,7 @@ export default function Cart() {
       <Script src="https://cdn.moyasar.com/mpf/1.14.0/moyasar.js" onLoad={() => setMoyasarReady(true)} />
 
       <div className="max-w-2xl mx-auto">
-        <h1 className="text-2xl font-bold text-navy mb-6">سلة المشتريات</h1>
+        <h1 className="text-2xl font-bold text-navy mb-6">{t("cart_title")}</h1>
 
         {!activeCheckout && (
           <div className="bg-white rounded-2xl shadow-sm divide-y mb-6">
@@ -137,7 +141,7 @@ export default function Cart() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="font-bold text-navy text-sm truncate">{item.title}</p>
-                  <p className="text-teal font-bold text-sm">{item.price} ريال</p>
+                  <p className="text-teal font-bold text-sm">{item.price} {t("riyal")}</p>
                 </div>
                 <div className="flex items-center gap-2">
                   <button
@@ -158,7 +162,7 @@ export default function Cart() {
                   onClick={() => removeFromCart(item.id)}
                   className="text-red-500 text-xs font-medium mr-2"
                 >
-                  حذف
+                  {t("cart_remove")}
                 </button>
               </div>
             ))}
@@ -168,16 +172,16 @@ export default function Cart() {
         {!activeCheckout && (
           <div className="bg-white rounded-2xl shadow-sm p-6 mb-6 text-sm space-y-2">
             <div className="flex justify-between">
-              <span>المجموع الفرعي</span>
-              <span>{subtotal.toFixed(2)} ريال</span>
+              <span>{t("cart_subtotal")}</span>
+              <span>{subtotal.toFixed(2)} {t("riyal")}</span>
             </div>
             <div className="flex justify-between">
-              <span>الشحن</span>
-              <span>{SHIPPING_COST} ريال</span>
+              <span>{t("cart_shipping")}</span>
+              <span>{SHIPPING_COST} {t("riyal")}</span>
             </div>
             <div className="flex justify-between font-bold text-navy border-t pt-2 mt-2 text-base">
-              <span>الإجمالي</span>
-              <span>{total.toFixed(2)} ريال</span>
+              <span>{t("cart_total")}</span>
+              <span>{total.toFixed(2)} {t("riyal")}</span>
             </div>
           </div>
         )}
@@ -187,16 +191,16 @@ export default function Cart() {
             onClick={handleCheckoutClick}
             className="w-full bg-navy text-white py-3 rounded-xl font-bold hover:opacity-90 transition"
           >
-            إتمام الشراء
+            {t("cart_checkout")}
           </button>
         )}
 
         {showShippingForm && !activeCheckout && (
           <form onSubmit={handleCreateOrders} className="bg-white rounded-2xl shadow-sm p-6 space-y-4">
-            <h2 className="font-bold text-navy">بيانات الشحن</h2>
+            <h2 className="font-bold text-navy">{t("cart_shipping_info")}</h2>
 
             <div>
-              <label className="block text-sm font-medium mb-1">الاسم الكامل</label>
+              <label className="block text-sm font-medium mb-1">{t("cart_full_name")}</label>
               <input
                 type="text"
                 required
@@ -207,7 +211,7 @@ export default function Cart() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">رقم الجوال</label>
+              <label className="block text-sm font-medium mb-1">{t("cart_phone")}</label>
               <input
                 type="tel"
                 required
@@ -219,7 +223,7 @@ export default function Cart() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">المدينة</label>
+              <label className="block text-sm font-medium mb-1">{t("cart_city")}</label>
               <input
                 type="text"
                 required
@@ -230,7 +234,7 @@ export default function Cart() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">العنوان التفصيلي</label>
+              <label className="block text-sm font-medium mb-1">{t("cart_address")}</label>
               <textarea
                 required
                 rows={2}
@@ -247,14 +251,14 @@ export default function Cart() {
               disabled={creatingOrder}
               className="w-full bg-teal text-white py-3 rounded-xl font-bold hover:opacity-90 disabled:opacity-50"
             >
-              {creatingOrder ? "جاري التجهيز..." : "متابعة للدفع"}
+              {creatingOrder ? t("cart_preparing") : t("cart_continue_payment")}
             </button>
           </form>
         )}
 
         {activeCheckout && (
           <div className="bg-white rounded-2xl shadow-sm p-6">
-            <h2 className="font-bold text-navy mb-4">إتمام الدفع</h2>
+            <h2 className="font-bold text-navy mb-4">{t("cart_complete_payment")}</h2>
             <div className="mysr-form"></div>
           </div>
         )}
