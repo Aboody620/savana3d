@@ -93,7 +93,7 @@ export default function Navbar() {
         </Link>
 
         <div
-          className="flex items-center gap-3 text-xs sm:text-sm flex-1 min-w-0 overflow-x-auto"
+          className="flex items-center gap-3 text-sm sm:text-base flex-1 min-w-0 overflow-x-auto"
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
           <Link href="/store" className="hover:text-gold whitespace-nowrap flex-shrink-0">
@@ -112,14 +112,8 @@ export default function Navbar() {
             </Link>
           )}
 
-          {user && (
-            <Link href="/dashboard" className="hover:text-gold whitespace-nowrap flex-shrink-0">
-              {t("nav_dashboard")}
-            </Link>
-          )}
-
           <Link href="/cart" className="relative hover:text-gold flex-shrink-0" aria-label={t("nav_cart")}>
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <circle cx="9" cy="21" r="1.5" fill="currentColor" stroke="none" />
               <circle cx="19" cy="21" r="1.5" fill="currentColor" stroke="none" />
               <path d="M2 3h2l2.4 12.2a2 2 0 0 0 2 1.6h8.8a2 2 0 0 0 2-1.6L21 7H6" strokeLinecap="round" strokeLinejoin="round" />
