@@ -113,7 +113,7 @@ export default function Dashboard() {
   return (
     <div>
       <h1 className="text-2xl font-bold text-navy mb-6">
-        لوحتي — {profile?.full_name}{" "}
+        تصاميمي — {profile?.full_name}{" "}
         <span className="text-sm text-gray-500">
           (
           {profile?.role === "customer"
@@ -235,6 +235,17 @@ export default function Dashboard() {
                 <p className="font-bold">{d.title}</p>
                 <p className="text-sm text-gray-500">{d.price} ريال</p>
               </div>
+              {d.file_url && (
+                <a
+                  href={d.file_url}
+                  download
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-navy text-white text-sm px-4 py-1.5 rounded-lg hover:opacity-90 whitespace-nowrap"
+                >
+                  تحميل الملف
+                </a>
+              )}
             </div>
           ))}
         </div>
