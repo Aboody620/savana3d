@@ -17,7 +17,7 @@ export default function Home() {
         />
 
         <h1 className="text-4xl font-black text-navy mb-4">
-          مع Savana3D اطبع أي تصميم ثلاثي الأبعاد، بدون ما تملك طابعة
+          مع سافانا اطبع أي تصميم ثلاثي الأبعاد، بدون ما تملك طابعة
         </h1>
         <p className="text-lg text-gray-600 mb-10 max-w-2xl mx-auto">
           ارفع تصميمك أو اختر من متجرنا، وشبكة من أصحاب الطابعات الجاهزين
