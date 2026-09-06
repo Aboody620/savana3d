@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useRouter } from "next/router";
 import { supabase } from "../lib/supabaseClient";
 import { useAuth } from "../lib/useAuth";
+import { useLanguage } from "../lib/LanguageContext";
+import { getT } from "../lib/translations";
 
 // أنواع ملفات التصميم المسموحة (امتداد + نوع MIME الفعلي)
 const ALLOWED_DESIGN_EXTENSIONS = ["stl", "obj", "3mf", "step", "stp"];
@@ -16,19 +18,19 @@ function getExtension(fileName) {
 }
 
 function validateDesignFile(file) {
-  if (!file) return "الرجاء اختيار ملف التصميم";
+  if (!file) return "upload_select_file_error";
 
   const ext = getExtension(file.name);
   if (!ALLOWED_DESIGN_EXTENSIONS.includes(ext)) {
-    return `نوع الملف غير مسموح. الأنواع المسموحة: ${ALLOWED_DESIGN_EXTENSIONS.join(", ")}`;
+    return "upload_file_type_error";
   }
 
   if (file.size > MAX_DESIGN_FILE_SIZE) {
-    return "حجم الملف كبير جدًا. الحد الأقصى 50 ميجابايت";
+    return "upload_file_size_error";
   }
 
   if (file.size === 0) {
-    return "الملف فارغ، تأكد من اختيار ملف صحيح";
+    return "upload_file_empty_error";
   }
 
   return null;
@@ -38,11 +40,11 @@ function validateImageFile(file) {
   if (!file) return null; // اختياري
 
   if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
-    return "صورة المعاينة يجب أن تكون JPG أو PNG أو WEBP فقط";
+    return "upload_image_type_error";
   }
 
   if (file.size > MAX_IMAGE_FILE_SIZE) {
-    return "حجم صورة المعاينة كبير جدًا. الحد الأقصى 5 ميجابايت";
+    return "upload_image_size_error";
   }
 
   return null;
@@ -51,6 +53,8 @@ function validateImageFile(file) {
 export default function Upload() {
   const router = useRouter();
   const { user, profile, loading: authLoading } = useAuth();
+  const { lang } = useLanguage();
+  const t = getT(lang);
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -60,29 +64,21 @@ export default function Upload() {
   const [error, setError] = useState("");
   const [uploading, setUploading] = useState(false);
 
-  if (authLoading) return <p>جاري التحميل...</p>;
+  if (authLoading) return <p>{t("dash_loading")}</p>;
 
   if (!user) {
-    return (
-      <p className="text-center text-gray-600">
-        سجّل الدخول كمصمم أول عشان ترفع تصاميم.
-      </p>
-    );
+    return <p className="text-center text-gray-600">{t("upload_login_required")}</p>;
   }
 
   if (profile && profile.role !== "designer") {
-    return (
-      <p className="text-center text-gray-600">
-        هذي الصفحة مخصصة لحسابات المصممين فقط.
-      </p>
-    );
+    return <p className="text-center text-gray-600">{t("upload_designer_only")}</p>;
   }
 
   function handleFileChange(e) {
     const selected = e.target.files[0];
-    const validationError = validateDesignFile(selected);
-    if (validationError) {
-      setError(validationError);
+    const errorKey = validateDesignFile(selected);
+    if (errorKey) {
+      setError(t(errorKey));
       setFile(null);
       e.target.value = "";
       return;
@@ -93,9 +89,9 @@ export default function Upload() {
 
   function handleImageChange(e) {
     const selected = e.target.files[0];
-    const validationError = validateImageFile(selected);
-    if (validationError) {
-      setError(validationError);
+    const errorKey = validateImageFile(selected);
+    if (errorKey) {
+      setError(t(errorKey));
       setPreviewImage(null);
       e.target.value = "";
       return;
@@ -109,15 +105,15 @@ export default function Upload() {
     setError("");
 
     // تحقق نهائي قبل الإرسال (دفاع إضافي حتى لو تجاوز المستخدم تحقق الحقل)
-    const fileValidationError = validateDesignFile(file);
-    if (fileValidationError) {
-      setError(fileValidationError);
+    const fileErrorKey = validateDesignFile(file);
+    if (fileErrorKey) {
+      setError(t(fileErrorKey));
       return;
     }
 
-    const imageValidationError = validateImageFile(previewImage);
-    if (imageValidationError) {
-      setError(imageValidationError);
+    const imageErrorKey = validateImageFile(previewImage);
+    if (imageErrorKey) {
+      setError(t(imageErrorKey));
       return;
     }
 
@@ -178,11 +174,11 @@ export default function Upload() {
 
   return (
     <div className="max-w-lg mx-auto bg-white p-8 rounded-xl shadow-sm">
-      <h1 className="text-2xl font-bold text-navy mb-6">رفع تصميم جديد</h1>
+      <h1 className="text-2xl font-bold text-navy mb-6">{t("upload_title")}</h1>
 
       <form onSubmit={handleUpload} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium mb-1">اسم التصميم</label>
+          <label className="block text-sm font-medium mb-1">{t("upload_name")}</label>
           <input
             type="text"
             required
@@ -193,7 +189,7 @@ export default function Upload() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1">الوصف</label>
+          <label className="block text-sm font-medium mb-1">{t("upload_description")}</label>
           <textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
@@ -203,7 +199,7 @@ export default function Upload() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1">السعر (ريال)</label>
+          <label className="block text-sm font-medium mb-1">{t("upload_price")}</label>
           <input
             type="number"
             step="0.01"
@@ -216,9 +212,7 @@ export default function Upload() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1">
-            ملف التصميم (STL / OBJ / 3MF / STEP) — حد أقصى 50 ميجابايت
-          </label>
+          <label className="block text-sm font-medium mb-1">{t("upload_design_file")}</label>
           <input
             type="file"
             required
@@ -229,9 +223,7 @@ export default function Upload() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1">
-            صورة معاينة (اختياري) — JPG/PNG/WEBP، حد أقصى 5 ميجابايت
-          </label>
+          <label className="block text-sm font-medium mb-1">{t("upload_preview_image")}</label>
           <input
             type="file"
             accept="image/jpeg,image/png,image/webp"
@@ -247,7 +239,7 @@ export default function Upload() {
           disabled={uploading}
           className="w-full bg-teal text-white py-2.5 rounded-lg font-bold hover:opacity-90 disabled:opacity-50"
         >
-          {uploading ? "جاري الرفع..." : "نشر التصميم"}
+          {uploading ? t("upload_uploading") : t("upload_submit")}
         </button>
       </form>
     </div>
