@@ -1,11 +1,23 @@
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { supabase } from "../lib/supabaseClient";
 import { useAuth } from "../lib/useAuth";
+import { getCartCount } from "../lib/cart";
 
 export default function Navbar() {
   const { user, profile } = useAuth();
   const router = useRouter();
+  const [cartCount, setCartCount] = useState(0);
+
+  useEffect(() => {
+    setCartCount(getCartCount());
+    function onUpdate() {
+      setCartCount(getCartCount());
+    }
+    window.addEventListener("cart-updated", onUpdate);
+    return () => window.removeEventListener("cart-updated", onUpdate);
+  }, []);
 
   async function handleLogout() {
     await supabase.auth.signOut();
@@ -37,6 +49,19 @@ export default function Navbar() {
               لوحتي
             </Link>
           )}
+
+          <Link href="/cart" className="relative hover:text-gold" aria-label="السلة">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="9" cy="21" r="1.5" fill="currentColor" stroke="none" />
+              <circle cx="19" cy="21" r="1.5" fill="currentColor" stroke="none" />
+              <path d="M2 3h2l2.4 12.2a2 2 0 0 0 2 1.6h8.8a2 2 0 0 0 2-1.6L21 7H6" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            {cartCount > 0 && (
+              <span className="absolute -top-2 -left-2 bg-gold text-navy text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                {cartCount}
+              </span>
+            )}
+          </Link>
 
           {!user ? (
             <>
