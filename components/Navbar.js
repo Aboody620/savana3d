@@ -119,7 +119,7 @@ export default function Navbar() {
               <path d="M2 3h2l2.4 12.2a2 2 0 0 0 2 1.6h8.8a2 2 0 0 0 2-1.6L21 7H6" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
             {cartCount > 0 && (
-              <span className="absolute -top-2 -left-2 bg-gold text-navy text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+              <span className={`absolute -top-2 ${lang === "ar" ? "-right-2" : "-left-2"} bg-gold text-navy text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center`}>
                 {cartCount}
               </span>
             )}
