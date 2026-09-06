@@ -93,7 +93,7 @@ export default function Navbar() {
         </Link>
 
         <div
-          className="flex items-center gap-3 text-sm sm:text-base flex-1 min-w-0 overflow-x-auto pt-2 -mt-2"
+          className="flex items-center gap-3 text-sm sm:text-base flex-1 min-w-0 overflow-x-auto"
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
           <Link href="/store" className="hover:text-gold whitespace-nowrap flex-shrink-0">
@@ -112,25 +112,25 @@ export default function Navbar() {
             </Link>
           )}
 
-          <Link href="/cart" className="relative hover:text-gold flex-shrink-0" aria-label={t("nav_cart")}>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <circle cx="9" cy="21" r="1.5" fill="currentColor" stroke="none" />
-              <circle cx="19" cy="21" r="1.5" fill="currentColor" stroke="none" />
-              <path d="M2 3h2l2.4 12.2a2 2 0 0 0 2 1.6h8.8a2 2 0 0 0 2-1.6L21 7H6" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-            {cartCount > 0 && (
-              <span className={`absolute -top-2 ${lang === "ar" ? "-right-2" : "-left-2"} bg-gold text-navy text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center`}>
-                {cartCount}
-              </span>
-            )}
-          </Link>
-
           {!user && (
             <Link href="/login" className="hover:text-gold whitespace-nowrap flex-shrink-0">
               {t("nav_login")}
             </Link>
           )}
         </div>
+
+        <Link href="/cart" className="relative hover:text-gold flex-shrink-0" aria-label={t("nav_cart")}>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <circle cx="9" cy="21" r="1.5" fill="currentColor" stroke="none" />
+            <circle cx="19" cy="21" r="1.5" fill="currentColor" stroke="none" />
+            <path d="M2 3h2l2.4 12.2a2 2 0 0 0 2 1.6h8.8a2 2 0 0 0 2-1.6L21 7H6" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+          {cartCount > 0 && (
+            <span className={`absolute -top-2 ${lang === "ar" ? "-right-2" : "-left-2"} bg-gold text-navy text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center`}>
+              {cartCount}
+            </span>
+          )}
+        </Link>
 
         <div className="flex-shrink-0">
           {!user ? (
