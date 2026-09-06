@@ -162,7 +162,7 @@ export default function Navbar() {
               </button>
 
               {menuOpen && (
-                <div className="absolute left-0 mt-2 w-64 bg-white dark:bg-slate-800 text-gray-800 dark:text-gray-100 rounded-xl shadow-lg overflow-hidden z-50 text-right border border-gray-100 dark:border-slate-700">
+                <div className={`absolute ${lang === "ar" ? "left-0" : "right-0"} mt-2 w-64 bg-white dark:bg-slate-800 text-gray-800 dark:text-gray-100 rounded-xl shadow-lg overflow-hidden z-50 text-right border border-gray-100 dark:border-slate-700`}>
                   {profile && (
                     <div className="px-4 py-3 border-b border-gray-100 dark:border-slate-700">
                       <p className="font-bold text-sm truncate">{profile.full_name}</p>
