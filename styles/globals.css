@@ -10,6 +10,70 @@ body {
   font-family: "Tajawal", "Segoe UI", Tahoma, Arial, sans-serif;
   background-color: #f8f9fb;
   color: #1a1a1a;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 @import url("https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap");
+
+/* ============================================================
+   الوضع الداكن — تطبيق عام يغطي كل صفحات الموقع
+   بدل ما نعدّل كل صفحة لحالها، هذي القواعد تعمل overrride
+   على أصناف Tailwind الشائعة بكل أنحاء المشروع (bg-white,
+   text-gray-*, border, إلخ) لما تنفعل .dark على <html>
+   ============================================================ */
+.dark body {
+  background-color: #0b1220;
+  color: #e5e7eb;
+}
+
+.dark .bg-white {
+  background-color: #111827 !important;
+}
+
+.dark .bg-gray-50 {
+  background-color: #0b1220 !important;
+}
+
+.dark .bg-gray-100,
+.dark .bg-gray-200 {
+  background-color: #1f2937 !important;
+}
+
+.dark .text-navy {
+  color: #93c5fd !important;
+}
+
+.dark .text-gray-900,
+.dark .text-gray-800,
+.dark .text-gray-700 {
+  color: #e5e7eb !important;
+}
+
+.dark .text-gray-600,
+.dark .text-gray-500 {
+  color: #9ca3af !important;
+}
+
+.dark .border,
+.dark .border-gray-200,
+.dark .border-gray-300 {
+  border-color: #374151 !important;
+}
+
+.dark input,
+.dark textarea,
+.dark select {
+  background-color: #1f2937 !important;
+  color: #e5e7eb !important;
+  border-color: #374151 !important;
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: #6b7280 !important;
+}
+
+.dark .shadow-sm,
+.dark .shadow-md {
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.55) !important;
+}
