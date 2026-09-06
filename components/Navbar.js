@@ -103,6 +103,12 @@ export default function Navbar() {
             </Link>
           )}
 
+          {user && profile?.role === "customer" && (
+            <Link href="/custom-order" className="hover:text-gold">
+              {t("nav_custom_order")}
+            </Link>
+          )}
+
           {user && (
             <Link href="/dashboard" className="hover:text-gold">
               {t("nav_dashboard")}
