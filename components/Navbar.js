@@ -5,21 +5,25 @@ import { supabase } from "../lib/supabaseClient";
 import { useAuth } from "../lib/useAuth";
 import { getCartCount } from "../lib/cart";
 import { useTheme } from "../lib/ThemeContext";
-
-const ROLE_LABELS = {
-  customer: "زبون",
-  designer: "مصمم",
-  printer: "صاحب طابعة",
-};
+import { useLanguage } from "../lib/LanguageContext";
+import { getT } from "../lib/translations";
 
 export default function Navbar() {
   const { user, profile } = useAuth();
   const router = useRouter();
   const { theme, setTheme } = useTheme();
+  const { lang, setLang } = useLanguage();
+  const t = getT(lang);
   const [cartCount, setCartCount] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
   const [switchingRole, setSwitchingRole] = useState(false);
   const menuRef = useRef(null);
+
+  const ROLE_LABELS = {
+    customer: t("role_customer"),
+    designer: t("role_designer"),
+    printer: t("role_printer"),
+  };
 
   useEffect(() => {
     setCartCount(getCartCount());
@@ -62,20 +66,20 @@ export default function Navbar() {
     if (!profile) return [];
     if (profile.role === "customer") {
       return [
-        { role: "designer", label: "التسجيل كمصمم" },
-        { role: "printer", label: "التسجيل كصاحب طابعة" },
+        { role: "designer", label: t("nav_register_designer") },
+        { role: "printer", label: t("nav_register_printer") },
       ];
     }
     if (profile.role === "designer") {
       return [
-        { role: "customer", label: "التبديل إلى زبون" },
-        { role: "printer", label: "التبديل إلى صاحب طابعة" },
+        { role: "customer", label: t("nav_switch_customer") },
+        { role: "printer", label: t("nav_switch_printer") },
       ];
     }
     // printer
     return [
-      { role: "customer", label: "التبديل إلى زبون" },
-      { role: "designer", label: "التبديل إلى مصمم" },
+      { role: "customer", label: t("nav_switch_customer") },
+      { role: "designer", label: t("nav_switch_designer") },
     ];
   })();
 
@@ -90,22 +94,22 @@ export default function Navbar() {
 
         <div className="flex items-center gap-4 text-sm">
           <Link href="/store" className="hover:text-gold">
-            المتجر
+            {t("nav_store")}
           </Link>
 
           {user && profile?.role === "designer" && (
             <Link href="/upload" className="hover:text-gold">
-              رفع تصميم
+              {t("nav_upload")}
             </Link>
           )}
 
           {user && (
             <Link href="/dashboard" className="hover:text-gold">
-              تصاميمي
+              {t("nav_dashboard")}
             </Link>
           )}
 
-          <Link href="/cart" className="relative hover:text-gold" aria-label="السلة">
+          <Link href="/cart" className="relative hover:text-gold" aria-label={t("nav_cart")}>
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <circle cx="9" cy="21" r="1.5" fill="currentColor" stroke="none" />
               <circle cx="19" cy="21" r="1.5" fill="currentColor" stroke="none" />
@@ -121,20 +125,20 @@ export default function Navbar() {
           {!user ? (
             <>
               <Link href="/login" className="hover:text-gold">
-                دخول
+                {t("nav_login")}
               </Link>
               <Link
                 href="/signup"
                 className="bg-teal px-3 py-1.5 rounded-md hover:opacity-90"
               >
-                إنشاء حساب
+                {t("nav_signup")}
               </Link>
             </>
           ) : (
             <div className="relative" ref={menuRef}>
               <button
                 onClick={() => setMenuOpen((v) => !v)}
-                aria-label="القائمة"
+                aria-label={t("nav_menu")}
                 aria-expanded={menuOpen}
                 className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors"
               >
@@ -159,7 +163,7 @@ export default function Navbar() {
                   {/* المظهر */}
                   <div className="px-4 py-3 border-b border-gray-100 dark:border-slate-700">
                     <p className="text-xs font-bold text-gray-500 dark:text-gray-400 mb-2">
-                      المظهر
+                      {t("nav_appearance")}
                     </p>
                     <div className="flex gap-2">
                       <button
@@ -171,7 +175,7 @@ export default function Navbar() {
                             : "border-gray-300 dark:border-slate-600"
                         }`}
                       >
-                        فاتح
+                        {t("nav_light")}
                       </button>
                       <button
                         type="button"
@@ -182,7 +186,38 @@ export default function Navbar() {
                             : "border-gray-300 dark:border-slate-600"
                         }`}
                       >
-                        داكن
+                        {t("nav_dark")}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* اللغة */}
+                  <div className="px-4 py-3 border-b border-gray-100 dark:border-slate-700">
+                    <p className="text-xs font-bold text-gray-500 dark:text-gray-400 mb-2">
+                      {t("nav_language")}
+                    </p>
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setLang("ar")}
+                        className={`flex-1 text-xs py-1.5 rounded-lg border transition-colors ${
+                          lang === "ar"
+                            ? "bg-navy text-white border-navy"
+                            : "border-gray-300 dark:border-slate-600"
+                        }`}
+                      >
+                        {t("nav_lang_ar")}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setLang("en")}
+                        className={`flex-1 text-xs py-1.5 rounded-lg border transition-colors ${
+                          lang === "en"
+                            ? "bg-navy text-white border-navy"
+                            : "border-gray-300 dark:border-slate-600"
+                        }`}
+                      >
+                        {t("nav_lang_en")}
                       </button>
                     </div>
                   </div>
@@ -191,7 +226,7 @@ export default function Navbar() {
                   {roleOptions.length > 0 && (
                     <div className="px-4 py-3 border-b border-gray-100 dark:border-slate-700">
                       <p className="text-xs font-bold text-gray-500 dark:text-gray-400 mb-2">
-                        نوع الحساب
+                        {t("nav_account_type")}
                       </p>
                       <div className="space-y-1">
                         {roleOptions.map((opt) => (
@@ -202,7 +237,7 @@ export default function Navbar() {
                             disabled={switchingRole}
                             className="w-full text-right text-sm py-1.5 px-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 disabled:opacity-50 transition-colors"
                           >
-                            {switchingRole ? "جاري التبديل..." : opt.label}
+                            {switchingRole ? t("nav_switching") : opt.label}
                           </button>
                         ))}
                       </div>
@@ -214,7 +249,7 @@ export default function Navbar() {
                     href="mailto:a.ali44xd@gmail.com?subject=مشكلة%20بمنصة%20Savana3D"
                     className="block px-4 py-3 text-sm hover:bg-gray-100 dark:hover:bg-slate-700 border-b border-gray-100 dark:border-slate-700 transition-colors"
                   >
-                    واجهتك مشكلة؟ تواصل معنا
+                    {t("nav_help")}
                   </a>
 
                   {/* تسجيل خروج */}
@@ -223,7 +258,7 @@ export default function Navbar() {
                     onClick={handleLogout}
                     className="w-full text-right px-4 py-3 text-sm text-red-600 font-bold hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
                   >
-                    تسجيل خروج
+                    {t("nav_logout")}
                   </button>
                 </div>
               )}
