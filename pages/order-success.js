@@ -1,35 +1,43 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
+import { clearCart } from "../lib/cart";
 
 export default function OrderSuccess() {
   const router = useRouter();
-  const { order_id: orderId, id: paymentId } = router.query;
+  const { order_ids: orderIdsParam, id: paymentId } = router.query;
 
   const [status, setStatus] = useState("verifying"); // verifying | success | failed
 
   useEffect(() => {
-    if (!orderId || !paymentId) return;
+    if (!orderIdsParam || !paymentId) return;
+
+    const orderIds = orderIdsParam.split(",").filter(Boolean);
 
     async function verify() {
       try {
         const res = await fetch("/api/verify-payment", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ orderId, paymentId }),
+          body: JSON.stringify({ orderIds, paymentId }),
         });
 
-        setStatus(res.ok ? "success" : "failed");
+        if (res.ok) {
+          clearCart();
+          setStatus("success");
+        } else {
+          setStatus("failed");
+        }
       } catch {
         setStatus("failed");
       }
     }
 
     verify();
-  }, [orderId, paymentId]);
+  }, [orderIdsParam, paymentId]);
 
   return (
-    <div className="max-w-md mx-auto bg-white p-8 rounded-xl shadow-sm text-center">
+    <div className="max-w-md mx-auto bg-white p-8 rounded-2xl shadow-sm text-center">
       {status === "verifying" && (
         <>
           <div className="text-5xl mb-4">⏳</div>
@@ -50,7 +58,7 @@ export default function OrderSuccess() {
           </p>
           <Link
             href="/dashboard"
-            className="inline-block bg-navy text-white px-6 py-3 rounded-lg font-bold hover:opacity-90"
+            className="inline-block bg-navy text-white px-6 py-3 rounded-xl font-bold hover:opacity-90"
           >
             اذهب للوحتي
           </Link>
@@ -69,7 +77,7 @@ export default function OrderSuccess() {
           </p>
           <Link
             href="/store"
-            className="inline-block bg-navy text-white px-6 py-3 rounded-lg font-bold hover:opacity-90"
+            className="inline-block bg-navy text-white px-6 py-3 rounded-xl font-bold hover:opacity-90"
           >
             الرجوع للمتجر
           </Link>
