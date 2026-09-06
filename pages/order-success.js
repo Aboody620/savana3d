@@ -2,10 +2,14 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { clearCart } from "../lib/cart";
+import { useLanguage } from "../lib/LanguageContext";
+import { getT } from "../lib/translations";
 
 export default function OrderSuccess() {
   const router = useRouter();
   const { order_ids: orderIdsParam, id: paymentId } = router.query;
+  const { lang } = useLanguage();
+  const t = getT(lang);
 
   const [status, setStatus] = useState("verifying"); // verifying | success | failed
 
@@ -41,26 +45,21 @@ export default function OrderSuccess() {
       {status === "verifying" && (
         <>
           <div className="text-5xl mb-4">⏳</div>
-          <h1 className="text-xl font-bold text-navy mb-2">
-            جاري التحقق من عملية الدفع...
-          </h1>
-          <p className="text-gray-600">هذا يأخذ ثواني بسيطة، لا تغلق الصفحة.</p>
+          <h1 className="text-xl font-bold text-navy mb-2">{t("success_verifying_title")}</h1>
+          <p className="text-gray-600">{t("success_verifying_desc")}</p>
         </>
       )}
 
       {status === "success" && (
         <>
           <div className="text-5xl mb-4">✅</div>
-          <h1 className="text-2xl font-bold text-navy mb-2">تم الدفع بنجاح!</h1>
-          <p className="text-gray-600 mb-6">
-            طلبك الآن بانتظار قبول أحد أصحاب الطابعات. راح تقدر تتابع حالته من
-            لوحتك.
-          </p>
+          <h1 className="text-2xl font-bold text-navy mb-2">{t("success_title")}</h1>
+          <p className="text-gray-600 mb-6">{t("success_desc")}</p>
           <Link
             href="/dashboard"
             className="inline-block bg-navy text-white px-6 py-3 rounded-xl font-bold hover:opacity-90"
           >
-            اذهب للوحتي
+            {t("success_go_dashboard")}
           </Link>
         </>
       )}
@@ -68,18 +67,13 @@ export default function OrderSuccess() {
       {status === "failed" && (
         <>
           <div className="text-5xl mb-4">⚠️</div>
-          <h1 className="text-2xl font-bold text-red-600 mb-2">
-            تعذر تأكيد الدفع
-          </h1>
-          <p className="text-gray-600 mb-6">
-            إذا تم خصم مبلغ من بطاقتك، تواصل معنا برقم الطلب قبل إعادة
-            المحاولة.
-          </p>
+          <h1 className="text-2xl font-bold text-red-600 mb-2">{t("success_failed_title")}</h1>
+          <p className="text-gray-600 mb-6">{t("success_failed_desc")}</p>
           <Link
             href="/store"
             className="inline-block bg-navy text-white px-6 py-3 rounded-xl font-bold hover:opacity-90"
           >
-            الرجوع للمتجر
+            {t("success_back_store")}
           </Link>
         </>
       )}
