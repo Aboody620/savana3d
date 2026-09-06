@@ -93,7 +93,7 @@ export default function Navbar() {
         </Link>
 
         <div
-          className="flex items-center gap-3 text-sm sm:text-base flex-1 min-w-0 overflow-x-auto"
+          className="flex items-center gap-3 text-sm sm:text-base flex-1 min-w-0 overflow-x-auto pt-2 -mt-2"
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
           <Link href="/store" className="hover:text-gold whitespace-nowrap flex-shrink-0">
