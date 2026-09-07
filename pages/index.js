@@ -11,7 +11,32 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Savana3D</title>
+        <title>Savana3D | اطبع أي تصميم ثلاثي الأبعاد بدون ما تملك طابعة</title>
+        <meta
+          name="description"
+          content="Savana3D سافانا — منصة سعودية تربطك بشبكة من أصحاب الطابعات ثلاثية الأبعاد. ارفع تصميمك أو اختر من متجرنا، واطلب طباعته وتوصيله لباب بيتك."
+        />
+        <link rel="canonical" href="https://savana3d.com/" />
+        <meta property="og:site_name" content="Savana3D" />
+        <meta property="og:title" content="Savana3D" />
+        <meta property="og:description" content="اطبع أي تصميم ثلاثي الأبعاد بدون ما تملك طابعة" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://savana3d.com/" />
+        <meta property="og:image" content="https://savana3d.com/logo-lockup.png" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              name: "Savana3D",
+              alternateName: "سافانا",
+              url: "https://savana3d.com",
+              logo: "https://savana3d.com/logo.png",
+            }),
+          }}
+        />
       </Head>
 
       <div className="text-center">
