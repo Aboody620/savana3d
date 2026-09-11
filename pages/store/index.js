@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import Head from "next/head";
 import Link from "next/link";
 import { supabase } from "../../lib/supabaseClient";
 import { addToCart } from "../../lib/cart";
@@ -49,6 +50,22 @@ export default function Store() {
 
   return (
     <div>
+      <Head>
+        <title>
+          {lang === "ar"
+            ? "متجر تصاميم الطباعة الثلاثية الأبعاد | Savana3D"
+            : "3D Design Store | Savana3D"}
+        </title>
+        <meta
+          name="description"
+          content={
+            lang === "ar"
+              ? "تصفح متجر تصاميم Savana3D للطباعة الثلاثية الأبعاد — اختر تصميم جاهز واطلب طباعته وتوصيله لباب بيتك عبر شبكة أصحاب الطابعات."
+              : "Browse Savana3D's 3D design store — pick a ready design and get it printed and delivered by our printer network."
+          }
+        />
+        <link rel="canonical" href="https://savana3d.com/store" />
+      </Head>
       {/* Hero banner */}
       <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-navy via-navy to-teal px-6 py-10 sm:py-14 mb-8 text-center">
         <div
