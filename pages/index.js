@@ -8,6 +8,37 @@ export default function Home() {
   const { lang } = useLanguage();
   const t = getT(lang);
 
+  const faqs =
+    lang === "ar"
+      ? [
+          {
+            q: "كيف أطبع تصميمي ثلاثي الأبعاد بدون ما أملك طابعة؟",
+            a: "ارفع ملف التصميم (STL) على Savana3D، واختر صاحب طابعة قريب منك من الشبكة، وهو يطبعه ويوصله لك.",
+          },
+          {
+            q: "هل أقدر أبيع تصاميمي ثلاثية الأبعاد على المنصة؟",
+            a: "إي، سجّل كمصمم وارفع تصاميمك الجاهزة بمتجر Savana3D، وتاخذ نسبتك من كل عملية بيع.",
+          },
+          {
+            q: "كيف أربح كصاحب طابعة ثلاثية الأبعاد؟",
+            a: "سجّل كصاحب طابعة، واقبل طلبات الطباعة اللي تناسب وقتك الفاضي، وتاخذ مقابل كل طلب تنفذه.",
+          },
+        ]
+      : [
+          {
+            q: "How can I print my 3D design without owning a printer?",
+            a: "Upload your STL file to Savana3D, choose a nearby printer owner from the network, and they'll print and deliver it to you.",
+          },
+          {
+            q: "Can I sell my 3D designs on the platform?",
+            a: "Yes, register as a designer and upload your ready designs to the Savana3D store to earn a share of every sale.",
+          },
+          {
+            q: "How do I earn as a 3D printer owner?",
+            a: "Register as a printer owner, accept printing requests that fit your free time, and earn for every order you fulfill.",
+          },
+        ];
+
   return (
     <>
       <Head>
@@ -103,6 +134,35 @@ export default function Home() {
               : "Savana3D is a Saudi platform for 3D printing services, connecting customers who want to print a design, designers who sell ready-made 3D designs, and printer owners who fulfill the orders. Whether you're looking to print your own design, buy a ready 3D design from our store, or own a 3D printer and want to earn from your idle time — Savana3D brings you all together in one network."}
           </p>
         </div>
+
+        <div className="max-w-3xl mx-auto px-4 mb-16 text-right">
+          <h2 className="text-xl sm:text-2xl font-bold text-navy mb-4">
+            {lang === "ar" ? "أسئلة شائعة" : "Frequently Asked Questions"}
+          </h2>
+          <div className="space-y-4">
+            {faqs.map((faq, i) => (
+              <details key={i} className="bg-white rounded-xl shadow-sm p-4">
+                <summary className="font-bold text-navy cursor-pointer">{faq.q}</summary>
+                <p className="text-gray-600 text-sm mt-2">{faq.a}</p>
+              </details>
+            ))}
+          </div>
+        </div>
+
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "FAQPage",
+              mainEntity: faqs.map((faq) => ({
+                "@type": "Question",
+                name: faq.q,
+                acceptedAnswer: { "@type": "Answer", text: faq.a },
+              })),
+            }),
+          }}
+        />
       </div>
     </>
   );
