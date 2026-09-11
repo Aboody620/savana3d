@@ -4,8 +4,9 @@ export default function Document() {
   return (
     <Html lang="ar" dir="rtl">
       <Head>
-        {/* يطبّق المظهر الداكن واللغة فورًا قبل عرض الصفحة، عشان نتجنب
-            وميض لحظي بإعدادات افتراضية خاطئة قبل ما يشتغل الكود بجافاسكربت */}
+        <link rel="icon" href="/logo.png" />
+        <link rel="apple-touch-icon" href="/logo.png" />
+        <meta name="theme-color" content="#1F3864" />
         <script
           dangerouslySetInnerHTML={{
             __html: `
