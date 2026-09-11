@@ -11,15 +11,19 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Savana3D | اطبع أي تصميم ثلاثي الأبعاد بدون ما تملك طابعة</title>
+        <title>Savana3D سافانا | طباعة ثلاثية الأبعاد بالسعودية — اطبع أو بيع تصاميمك 3D</title>
         <meta
           name="description"
-          content="Savana3D سافانا — منصة سعودية تربطك بشبكة من أصحاب الطابعات ثلاثية الأبعاد. ارفع تصميمك أو اختر من متجرنا، واطلب طباعته وتوصيله لباب بيتك."
+          content="Savana3D منصة سعودية لخدمات الطباعة الثلاثية الأبعاد (3D Printing). ارفع تصميمك واطلب طباعته، أو اختر تصميمًا جاهزًا من متجرنا، أو انضم كصاحب طابعة واربح من طباعة طلبات العملاء. شبكة طابعات 3D بالسعودية توصلك بأقرب مقدم خدمة."
+        />
+        <meta
+          name="keywords"
+          content="طباعة ثلاثية الأبعاد, طباعة 3D, طباعة تصاميم 3D, بيع تصاميم 3D, اطبع تصميمي, طابعة 3D السعودية, Savana3D, 3D printing Saudi Arabia"
         />
         <link rel="canonical" href="https://savana3d.com/" />
         <meta property="og:site_name" content="Savana3D" />
-        <meta property="og:title" content="Savana3D" />
-        <meta property="og:description" content="اطبع أي تصميم ثلاثي الأبعاد بدون ما تملك طابعة" />
+        <meta property="og:title" content="Savana3D | طباعة ثلاثية الأبعاد بالسعودية" />
+        <meta property="og:description" content="اطبع أي تصميم ثلاثي الأبعاد بدون ما تملك طابعة — أو اربح كصاحب طابعة" />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://savana3d.com/" />
         <meta property="og:image" content="https://savana3d.com/logo-lockup.png" />
@@ -34,6 +38,7 @@ export default function Home() {
               alternateName: "سافانا",
               url: "https://savana3d.com",
               logo: "https://savana3d.com/logo.png",
+              description: "منصة سعودية لخدمات الطباعة الثلاثية الأبعاد تربط العملاء بشبكة من أصحاب الطابعات والمصممين",
             }),
           }}
         />
@@ -86,6 +91,17 @@ export default function Home() {
             <h3 className="font-bold text-gold mb-2">{t("home_printer_title")}</h3>
             <p className="text-gray-600 text-sm">{t("home_printer_desc")}</p>
           </div>
+        </div>
+
+        <div className="max-w-3xl mx-auto px-4 mb-16 text-right">
+          <h2 className="text-xl sm:text-2xl font-bold text-navy mb-4">
+            {lang === "ar" ? "منصة طباعة ثلاثية الأبعاد في السعودية" : "3D Printing Platform in Saudi Arabia"}
+          </h2>
+          <p className="text-gray-600 text-sm sm:text-base leading-relaxed">
+            {lang === "ar"
+              ? "Savana3D هي منصة سعودية متخصصة في خدمات الطباعة الثلاثية الأبعاد، تربط بين ثلاثة أطراف: العميل اللي يبغى يطبع تصميم، المصمم اللي يبيع تصاميمه الجاهزة، وصاحب الطابعة اللي ينفّذ الطلب. سواء كنت تدور على مكان يطبع لك تصميمك الخاص، تبغى تشتري تصميم 3D جاهز من متجرنا، أو عندك طابعة ثلاثية الأبعاد وتبغى تربح من وقتها الفاضي — Savana3D يجمعكم بشبكة واحدة، بدون ما تحتاج تملك طابعة بنفسك."
+              : "Savana3D is a Saudi platform for 3D printing services, connecting customers who want to print a design, designers who sell ready-made 3D designs, and printer owners who fulfill the orders. Whether you're looking to print your own design, buy a ready 3D design from our store, or own a 3D printer and want to earn from your idle time — Savana3D brings you all together in one network."}
+          </p>
         </div>
       </div>
     </>
