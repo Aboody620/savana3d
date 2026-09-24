@@ -76,6 +76,9 @@ export default function Store() {
           }}
         />
         <div className="relative">
+          <span className="inline-block bg-gold/20 text-gold text-xs sm:text-sm font-bold px-3 py-1 rounded-full mb-3">
+            {lang === "ar" ? "🖨️ طباعة ثلاثية الأبعاد حقيقية" : "🖨️ Real 3D Printing"}
+          </span>
           <h1 className="text-2xl sm:text-4xl font-black text-white mb-3">{t("store_title")}</h1>
           <p className="text-white/80 max-w-xl mx-auto text-sm sm:text-base">{t("store_subtitle")}</p>
         </div>
