@@ -5,7 +5,7 @@ import { supabase } from "../../lib/supabaseClient";
 import { addToCart } from "../../lib/cart";
 import { useLanguage } from "../../lib/LanguageContext";
 import { getT } from "../../lib/translations";
-import { PrintLayerPattern, NozzleBadge, FilamentBadge } from "../../components/PrintDecor";
+import { NozzleBadge, FilamentBadge } from "../../components/PrintDecor";
 
 const CATEGORIES = [
   { slug: "all", icon: "✨", key: "cat_all" },
@@ -83,7 +83,6 @@ export default function Store() {
 
       {/* Hero: طبقات طباعة + رأس الطابعة + بكرة الفلامنت */}
       <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-navy via-navy to-teal px-6 py-12 sm:py-16 mb-6 text-center">
-        <PrintLayerPattern className="opacity-100" />
         <div
           className="pointer-events-none absolute inset-0"
           style={{
