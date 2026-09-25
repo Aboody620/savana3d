@@ -3,6 +3,7 @@ import Link from "next/link";
 import { useLanguage } from "../lib/LanguageContext";
 import { getT } from "../lib/translations";
 import WaterHero from "../components/WaterHero";
+import { PrintLayerPattern } from "../components/PrintDecor";
 
 export default function Home() {
   const { lang } = useLanguage();
@@ -111,17 +112,31 @@ export default function Home() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-16 mb-16 px-4 max-w-5xl mx-auto text-right">
           <div className="bg-white p-6 rounded-xl shadow-sm">
+            <div className="h-11 w-11 rounded-lg bg-navy/10 text-navy flex items-center justify-center text-xl mb-3">
+              📤
+            </div>
             <h3 className="font-bold text-navy mb-2">{t("home_customer_title")}</h3>
             <p className="text-gray-600 text-sm">{t("home_customer_desc")}</p>
           </div>
           <div className="bg-white p-6 rounded-xl shadow-sm">
+            <div className="h-11 w-11 rounded-lg bg-teal/10 text-teal flex items-center justify-center text-xl mb-3">
+              🎨
+            </div>
             <h3 className="font-bold text-teal mb-2">{t("home_designer_title")}</h3>
             <p className="text-gray-600 text-sm">{t("home_designer_desc")}</p>
           </div>
           <div className="bg-white p-6 rounded-xl shadow-sm">
+            <div className="h-11 w-11 rounded-lg bg-gold/10 text-gold flex items-center justify-center text-xl mb-3">
+              🖨️
+            </div>
             <h3 className="font-bold text-gold mb-2">{t("home_printer_title")}</h3>
             <p className="text-gray-600 text-sm">{t("home_printer_desc")}</p>
           </div>
+        </div>
+
+        {/* فاصل بصري يحاكي طبقات الطباعة */}
+        <div className="relative h-8 max-w-5xl mx-auto mb-4 overflow-hidden rounded-full bg-navy/90">
+          <PrintLayerPattern opacity={0.35} />
         </div>
 
         <div className="max-w-3xl mx-auto px-4 mb-16 text-right">

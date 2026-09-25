@@ -5,6 +5,16 @@ import { supabase } from "../../lib/supabaseClient";
 import { addToCart } from "../../lib/cart";
 import { useLanguage } from "../../lib/LanguageContext";
 import { getT } from "../../lib/translations";
+import { PrintLayerPattern, NozzleBadge, FilamentBadge } from "../../components/PrintDecor";
+
+const CATEGORIES = [
+  { slug: "all", icon: "✨", key: "cat_all" },
+  { slug: "decor", icon: "🏺", key: "cat_decor" },
+  { slug: "toys", icon: "🧸", key: "cat_toys" },
+  { slug: "home", icon: "🏠", key: "cat_home" },
+  { slug: "hobby", icon: "⚙️", key: "cat_hobby" },
+  { slug: "edu", icon: "📚", key: "cat_edu" },
+];
 
 export default function Store() {
   const { lang } = useLanguage();
@@ -14,6 +24,7 @@ export default function Store() {
   const [addedId, setAddedId] = useState(null);
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState("newest");
+  const [category, setCategory] = useState("all");
 
   useEffect(() => {
     async function loadDesigns() {
@@ -38,6 +49,9 @@ export default function Store() {
 
   const filtered = useMemo(() => {
     let list = designs;
+    if (category !== "all") {
+      list = list.filter((d) => (d.category || "decor") === category);
+    }
     if (query.trim()) {
       const q = query.trim().toLowerCase();
       list = list.filter((d) => d.title?.toLowerCase().includes(q));
@@ -46,7 +60,7 @@ export default function Store() {
     if (sort === "price_asc") list.sort((a, b) => a.price - b.price);
     else if (sort === "price_desc") list.sort((a, b) => b.price - a.price);
     return list;
-  }, [designs, query, sort]);
+  }, [designs, query, sort, category]);
 
   return (
     <div>
@@ -66,22 +80,63 @@ export default function Store() {
         />
         <link rel="canonical" href="https://savana3d.com/store" />
       </Head>
-      {/* Hero banner */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-navy via-navy to-teal px-6 py-10 sm:py-14 mb-8 text-center">
+
+      {/* Hero: طبقات طباعة + رأس الطابعة + بكرة الفلامنت */}
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-navy via-navy to-teal px-6 py-12 sm:py-16 mb-6 text-center">
+        <PrintLayerPattern className="opacity-100" />
         <div
-          className="pointer-events-none absolute inset-0 opacity-20"
+          className="pointer-events-none absolute inset-0"
           style={{
             backgroundImage:
               "radial-gradient(circle at 20% 20%, #ffffff 0, transparent 35%), radial-gradient(circle at 80% 60%, #9C7A29 0, transparent 40%)",
+            opacity: 0.2,
           }}
         />
+        <FilamentBadge className="hidden sm:block absolute top-4 right-4 w-16 h-16 sm:w-20 sm:h-20 opacity-80" />
+        <NozzleBadge className="hidden sm:block absolute bottom-0 left-6 w-20 h-24 sm:w-24 sm:h-28" />
+
         <div className="relative">
           <span className="inline-block bg-gold/20 text-gold text-xs sm:text-sm font-bold px-3 py-1 rounded-full mb-3">
             {lang === "ar" ? "🖨️ طباعة ثلاثية الأبعاد حقيقية" : "🖨️ Real 3D Printing"}
           </span>
           <h1 className="text-2xl sm:text-4xl font-black text-white mb-3">{t("store_title")}</h1>
-          <p className="text-white/80 max-w-xl mx-auto text-sm sm:text-base">{t("store_subtitle")}</p>
+          <p className="text-white/85 max-w-xl mx-auto text-sm sm:text-base">{t("store_subtitle")}</p>
         </div>
+      </div>
+
+      {/* شريط الخطوات الثلاث */}
+      <div className="grid grid-cols-3 sm:flex sm:items-stretch sm:justify-between gap-3 sm:gap-4 mb-8 bg-white rounded-2xl shadow-sm border border-gray-100 px-3 sm:px-6 py-4">
+        {[t("process_step1"), t("process_step2"), t("process_step3")].map((label, i) => (
+          <div key={i} className="flex flex-col sm:flex-row items-center sm:flex-1 sm:min-w-0 text-center sm:text-right">
+            <div className="flex flex-col sm:flex-row items-center sm:gap-3 gap-1.5 min-w-0 w-full">
+              <span className="shrink-0 h-7 w-7 sm:h-8 sm:w-8 rounded-full bg-navy text-white text-xs sm:text-sm font-bold flex items-center justify-center">
+                {i + 1}
+              </span>
+              <span className="text-[11px] sm:text-sm font-bold text-navy leading-tight sm:truncate">{label}</span>
+            </div>
+            {i < 2 && (
+              <span className="hidden sm:block flex-1 h-px bg-gray-200 mx-3" aria-hidden="true" />
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* تصنيفات قابلة للفلترة */}
+      <div className="flex gap-2 overflow-x-auto pb-1 mb-5 -mx-1 px-1">
+        {CATEGORIES.map((c) => (
+          <button
+            key={c.slug}
+            onClick={() => setCategory(c.slug)}
+            className={`shrink-0 flex items-center gap-1.5 rounded-full px-4 py-2 text-xs sm:text-sm font-bold border transition-colors ${
+              category === c.slug
+                ? "bg-navy text-white border-navy"
+                : "bg-white text-navy border-gray-200 hover:border-navy/40"
+            }`}
+          >
+            <span>{c.icon}</span>
+            <span>{t(c.key)}</span>
+          </button>
+        ))}
       </div>
 
       {/* Controls */}
@@ -138,51 +193,67 @@ export default function Store() {
           ))}
         </div>
       ) : filtered.length === 0 ? (
-        <div className="text-center py-20 bg-white rounded-2xl shadow-sm border border-gray-100">
-          <p className="text-gray-500">{t("store_empty")}</p>
+        <div className="relative text-center py-16 px-6 bg-white rounded-2xl shadow-sm border border-dashed border-gray-200 overflow-hidden">
+          <div className="text-4xl mb-3">🚀</div>
+          <p className="font-black text-navy text-lg mb-2">{t("store_empty_title")}</p>
+          <p className="text-gray-500 text-sm max-w-sm mx-auto">{t("store_empty_desc")}</p>
         </div>
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-          {filtered.map((d) => (
-            <Link
-              key={d.id}
-              href={`/store/${d.id}`}
-              className="group bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-200 flex flex-col"
-            >
-              <div className="relative aspect-square bg-[#EEF2F6] overflow-hidden">
-                {d.preview_image_url ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={d.preview_image_url}
-                    alt={d.title}
-                    className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                ) : (
-                  <div className="h-full w-full flex items-center justify-center text-gray-300 text-sm">
-                    {t("store_no_preview")}
-                  </div>
-                )}
-                <span className="absolute top-2 left-2 bg-white/90 backdrop-blur text-navy text-xs font-bold px-2 py-1 rounded-lg shadow-sm">
-                  {d.price} {t("riyal")}
-                </span>
-              </div>
-              <div className="p-3 md:p-4 flex flex-col flex-1">
-                <h3 className="font-bold text-navy text-sm md:text-base leading-snug line-clamp-2 mb-3">
-                  {d.title}
-                </h3>
-                <button
-                  onClick={(e) => handleAdd(e, d)}
-                  className={`mt-auto w-full text-xs md:text-sm font-bold py-2 rounded-lg transition-colors ${
-                    addedId === d.id
-                      ? "bg-teal text-white"
-                      : "bg-navy/5 text-navy hover:bg-navy hover:text-white"
-                  }`}
-                >
-                  {addedId === d.id ? t("store_added") : t("store_add_to_cart")}
-                </button>
-              </div>
-            </Link>
-          ))}
+          {filtered.map((d) => {
+            const techParts = [];
+            if (d.print_time_hours) {
+              techParts.push(`⏱️ ${t("card_print_time")}: ${d.print_time_hours} ${t("card_hours")}`);
+            }
+            if (d.material) {
+              techParts.push(`🧵 ${t("card_material")}: ${d.material}`);
+            }
+            techParts.push(`🎨 ${d.multi_color ? t("card_colors_multi") : t("card_colors_one")}`);
+
+            return (
+              <Link
+                key={d.id}
+                href={`/store/${d.id}`}
+                className="group bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-200 flex flex-col"
+              >
+                <div className="relative aspect-square bg-[#EEF2F6] overflow-hidden">
+                  {d.preview_image_url ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={d.preview_image_url}
+                      alt={d.title}
+                      className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                  ) : (
+                    <div className="h-full w-full flex items-center justify-center text-gray-300 text-sm">
+                      {t("store_no_preview")}
+                    </div>
+                  )}
+                  <span className="absolute top-2 left-2 bg-white/90 backdrop-blur text-navy text-xs font-bold px-2 py-1 rounded-lg shadow-sm">
+                    {d.price} {t("riyal")}
+                  </span>
+                </div>
+                <div className="p-3 md:p-4 flex flex-col flex-1">
+                  <h3 className="font-bold text-navy text-sm md:text-base leading-snug line-clamp-2 mb-1.5">
+                    {d.title}
+                  </h3>
+                  <p className="text-[11px] md:text-xs text-gray-500 leading-relaxed mb-3">
+                    {techParts.join(" · ")}
+                  </p>
+                  <button
+                    onClick={(e) => handleAdd(e, d)}
+                    className={`mt-auto w-full text-xs md:text-sm font-bold py-2 rounded-lg transition-colors ${
+                      addedId === d.id
+                        ? "bg-teal text-white"
+                        : "bg-navy/5 text-navy hover:bg-navy hover:text-white"
+                    }`}
+                  >
+                    {addedId === d.id ? t("store_added") : t("store_add_to_cart")}
+                  </button>
+                </div>
+              </Link>
+            );
+          })}
         </div>
       )}
     </div>

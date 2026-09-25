@@ -61,6 +61,10 @@ export default function Upload() {
   const [price, setPrice] = useState("");
   const [file, setFile] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
+  const [category, setCategory] = useState("decor");
+  const [printTimeHours, setPrintTimeHours] = useState("");
+  const [material, setMaterial] = useState("PLA");
+  const [multiColor, setMultiColor] = useState(false);
   const [error, setError] = useState("");
   const [uploading, setUploading] = useState(false);
 
@@ -160,6 +164,10 @@ export default function Upload() {
         price: parseFloat(price),
         file_url: fileUrlData.publicUrl,
         preview_image_url: previewUrl,
+        category,
+        print_time_hours: printTimeHours ? parseFloat(printTimeHours) : null,
+        material,
+        multi_color: multiColor,
       });
 
       if (insertError) throw insertError;
@@ -209,6 +217,59 @@ export default function Upload() {
             onChange={(e) => setPrice(e.target.value)}
             className="w-full border rounded-lg px-3 py-2"
           />
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="block text-sm font-medium mb-1">{t("upload_category")}</label>
+            <select
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              className="w-full border rounded-lg px-3 py-2"
+            >
+              <option value="decor">{t("cat_decor")}</option>
+              <option value="toys">{t("cat_toys")}</option>
+              <option value="home">{t("cat_home")}</option>
+              <option value="hobby">{t("cat_hobby")}</option>
+              <option value="edu">{t("cat_edu")}</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">{t("upload_material")}</label>
+            <select
+              value={material}
+              onChange={(e) => setMaterial(e.target.value)}
+              className="w-full border rounded-lg px-3 py-2"
+            >
+              <option value="PLA">PLA</option>
+              <option value="ABS">ABS</option>
+              <option value="PETG">PETG</option>
+              <option value="Resin">Resin</option>
+            </select>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3 items-end">
+          <div>
+            <label className="block text-sm font-medium mb-1">{t("upload_print_time")}</label>
+            <input
+              type="number"
+              step="0.5"
+              min="0"
+              value={printTimeHours}
+              onChange={(e) => setPrintTimeHours(e.target.value)}
+              className="w-full border rounded-lg px-3 py-2"
+            />
+          </div>
+          <label className="flex items-center gap-2 text-sm font-medium mb-2.5">
+            <input
+              type="checkbox"
+              checked={multiColor}
+              onChange={(e) => setMultiColor(e.target.checked)}
+              className="h-4 w-4 rounded border-gray-300"
+            />
+            {t("upload_multi_color")}
+          </label>
         </div>
 
         <div>

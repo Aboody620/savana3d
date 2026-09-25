@@ -66,6 +66,15 @@ export default function DesignDetail() {
 
         <div className="p-6 md:p-8">
           <h1 className="text-2xl font-bold text-navy mb-2">{design.title}</h1>
+
+          <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs md:text-sm text-gray-500 mb-4">
+            {design.print_time_hours && (
+              <span>⏱️ {t("card_print_time")}: {design.print_time_hours} {t("card_hours")}</span>
+            )}
+            {design.material && <span>🧵 {t("card_material")}: {design.material}</span>}
+            <span>🎨 {design.multi_color ? t("card_colors_multi") : t("card_colors_one")}</span>
+          </div>
+
           <p className="text-gray-600 mb-6">{design.description}</p>
 
           <div className="flex items-center justify-between mb-6">
