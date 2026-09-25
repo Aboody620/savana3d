@@ -17,6 +17,7 @@ export default function Navbar() {
   const [cartCount, setCartCount] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
   const [switchingRole, setSwitchingRole] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const menuRef = useRef(null);
 
   const ROLE_LABELS = {
@@ -24,6 +25,15 @@ export default function Navbar() {
     designer: t("role_designer"),
     printer: t("role_printer"),
   };
+
+  useEffect(() => {
+    function onScroll() {
+      setScrolled(window.scrollY > 8);
+    }
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   useEffect(() => {
     setCartCount(getCartCount());
@@ -84,7 +94,11 @@ export default function Navbar() {
   })();
 
   return (
-    <nav className="bg-navy text-white shadow-md relative">
+    <nav
+      className={`sticky top-0 z-40 bg-navy text-white transition-shadow duration-200 ${
+        scrolled ? "shadow-lg" : "shadow-sm"
+      }`}
+    >
       <div className="max-w-5xl mx-auto px-3 sm:px-4 py-3 flex items-center gap-2">
         <Link href="/" className="flex items-center gap-2 font-bold text-base sm:text-lg flex-shrink-0 whitespace-nowrap">
           {/* eslint-disable-next-line @next/next/no-img-element */}
