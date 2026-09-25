@@ -111,23 +111,35 @@ export default function Home() {
         </WaterHero>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-16 mb-16 px-4 max-w-5xl mx-auto text-right">
-          <div className="bg-white p-6 rounded-xl shadow-sm">
-            <div className="h-11 w-11 rounded-lg bg-navy/10 text-navy flex items-center justify-center text-xl mb-3">
-              📤
+          <div className="group bg-white p-6 rounded-xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-200 border border-transparent hover:border-navy/10">
+            <div className="h-11 w-11 rounded-lg bg-navy/10 text-navy flex items-center justify-center mb-3">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 16V4M12 4l-5 5M12 4l5 5" />
+                <path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3" />
+              </svg>
             </div>
             <h3 className="font-bold text-navy mb-2">{t("home_customer_title")}</h3>
             <p className="text-gray-600 text-sm">{t("home_customer_desc")}</p>
           </div>
-          <div className="bg-white p-6 rounded-xl shadow-sm">
-            <div className="h-11 w-11 rounded-lg bg-teal/10 text-teal flex items-center justify-center text-xl mb-3">
-              🎨
+          <div className="group bg-white p-6 rounded-xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-200 border border-transparent hover:border-teal/10">
+            <div className="h-11 w-11 rounded-lg bg-teal/10 text-teal flex items-center justify-center mb-3">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 21a9 9 0 1 1 0-18c4.5 0 8 3 8 6.5 0 2-1.5 3.5-3.5 3.5H15a1.5 1.5 0 0 0-1 2.6c.3.3.5.7.5 1.2 0 1.2-1.1 2.2-2.5 2.2Z" />
+                <circle cx="7.5" cy="10.5" r="1" fill="currentColor" stroke="none" />
+                <circle cx="12" cy="7.5" r="1" fill="currentColor" stroke="none" />
+                <circle cx="16.5" cy="10.5" r="1" fill="currentColor" stroke="none" />
+              </svg>
             </div>
             <h3 className="font-bold text-teal mb-2">{t("home_designer_title")}</h3>
             <p className="text-gray-600 text-sm">{t("home_designer_desc")}</p>
           </div>
-          <div className="bg-white p-6 rounded-xl shadow-sm">
-            <div className="h-11 w-11 rounded-lg bg-gold/10 text-gold flex items-center justify-center text-xl mb-3">
-              🖨️
+          <div className="group bg-white p-6 rounded-xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-200 border border-transparent hover:border-gold/10">
+            <div className="h-11 w-11 rounded-lg bg-gold/10 text-gold flex items-center justify-center mb-3">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M6 9V3h12v6" />
+                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+                <rect x="6" y="14" width="12" height="7" />
+              </svg>
             </div>
             <h3 className="font-bold text-gold mb-2">{t("home_printer_title")}</h3>
             <p className="text-gray-600 text-sm">{t("home_printer_desc")}</p>
