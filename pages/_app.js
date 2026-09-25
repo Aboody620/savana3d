@@ -22,15 +22,41 @@ function AppShell({ Component, pageProps }) {
       <main className="max-w-5xl mx-auto px-4 py-8 flex-1 w-full">
         <Component {...pageProps} />
       </main>
-      <footer className="border-t border-gray-200 dark:border-slate-800 py-6 mt-8">
-        <div className="max-w-5xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-gray-500 dark:text-gray-400">
-          <p>© {new Date().getFullYear()} Savana3D — {t("footer_rights")}</p>
-          <a
-            href="mailto:a.ali44xd@gmail.com?subject=مشكلة%20بمنصة%20Savana3D"
-            className="hover:text-teal"
-          >
-            {t("footer_contact")}
-          </a>
+      <footer className="border-t border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 py-10 mt-8">
+        <div className="max-w-5xl mx-auto px-4 grid grid-cols-1 sm:grid-cols-3 gap-8 text-right">
+          <div>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo.svg" alt="Savana3D" className="h-8 mb-3 ms-auto" />
+            <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
+              {t("footer_about_text")}
+            </p>
+          </div>
+          <div>
+            <h4 className="font-bold text-sm text-navy dark:text-white mb-3">{t("footer_quick_links")}</h4>
+            <ul className="space-y-2 text-xs text-gray-500 dark:text-gray-400">
+              <li>
+                <a href="/store" className="hover:text-teal">{t("nav_store")}</a>
+              </li>
+              <li>
+                <a href="/signup" className="hover:text-teal">{t("nav_signup")}</a>
+              </li>
+              <li>
+                <a href="/login" className="hover:text-teal">{t("nav_login")}</a>
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h4 className="font-bold text-sm text-navy dark:text-white mb-3">{t("footer_connect")}</h4>
+            <a
+              href="mailto:a.ali44xd@gmail.com?subject=مشكلة%20بمنصة%20Savana3D"
+              className="text-xs text-gray-500 dark:text-gray-400 hover:text-teal"
+            >
+              a.ali44xd@gmail.com
+            </a>
+          </div>
+        </div>
+        <div className="max-w-5xl mx-auto px-4 mt-8 pt-6 border-t border-gray-100 dark:border-slate-800 text-center text-xs text-gray-400 dark:text-gray-500">
+          © {new Date().getFullYear()} Savana3D — {t("footer_rights")}
         </div>
       </footer>
     </div>
