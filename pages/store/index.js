@@ -5,7 +5,6 @@ import { supabase } from "../../lib/supabaseClient";
 import { addToCart } from "../../lib/cart";
 import { useLanguage } from "../../lib/LanguageContext";
 import { getT } from "../../lib/translations";
-import { NozzleBadge, FilamentBadge } from "../../components/PrintDecor";
 
 const CATEGORIES = [
   { slug: "all", icon: "✨", key: "cat_all" },
@@ -91,8 +90,6 @@ export default function Store() {
             opacity: 0.2,
           }}
         />
-        <FilamentBadge className="hidden sm:block absolute top-4 right-4 w-16 h-16 sm:w-20 sm:h-20 opacity-80" />
-        <NozzleBadge className="hidden sm:block absolute bottom-0 left-6 w-20 h-24 sm:w-24 sm:h-28" />
 
         <div className="relative">
           <span className="inline-block bg-gold/20 text-gold text-xs sm:text-sm font-bold px-3 py-1 rounded-full mb-3">
