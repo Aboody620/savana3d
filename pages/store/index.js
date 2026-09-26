@@ -114,6 +114,33 @@ export default function Store() {
         ))}
       </div>
 
+      {/* شريط الثقة */}
+      <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 mb-8 text-[11px] sm:text-xs text-gray-500">
+        <div className="flex items-center gap-1.5">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-teal">
+            <path d="M3 3h13v13H3z" />
+            <path d="M16 8h4l1 5v3h-5V8Z" />
+            <circle cx="7.5" cy="18.5" r="1.8" />
+            <circle cx="17.5" cy="18.5" r="1.8" />
+          </svg>
+          <span>{t("trust_delivery")}</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-teal">
+            <rect x="2" y="5" width="20" height="14" rx="2" />
+            <path d="M2 10h20" />
+          </svg>
+          <span>{t("trust_payment")}</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-teal">
+            <circle cx="12" cy="8" r="4" />
+            <path d="M4 21c0-4 3.5-6 8-6s8 2 8 6" />
+          </svg>
+          <span>{t("trust_network")}</span>
+        </div>
+      </div>
+
       {/* تصنيفات قابلة للفلترة */}
       <div className="flex gap-2 overflow-x-auto pb-1 mb-5 -mx-1 px-1">
         {CATEGORIES.map((c) => (
@@ -186,11 +213,28 @@ export default function Store() {
           ))}
         </div>
       ) : filtered.length === 0 ? (
-        <div className="relative text-center py-16 px-6 bg-white rounded-2xl shadow-sm border border-dashed border-gray-200 overflow-hidden">
-          <div className="text-4xl mb-3">🚀</div>
-          <p className="font-black text-navy text-lg mb-2">{t("store_empty_title")}</p>
-          <p className="text-gray-500 text-sm max-w-sm mx-auto">{t("store_empty_desc")}</p>
-        </div>
+        designs.length === 0 ? (
+          <div className="relative text-center py-16 px-6 bg-white rounded-2xl shadow-sm border border-dashed border-gray-200 overflow-hidden">
+            <div className="text-4xl mb-3">🚀</div>
+            <p className="font-black text-navy text-lg mb-2">{t("store_empty_title")}</p>
+            <p className="text-gray-500 text-sm max-w-sm mx-auto">{t("store_empty_desc")}</p>
+          </div>
+        ) : (
+          <div className="relative text-center py-16 px-6 bg-white rounded-2xl shadow-sm border border-dashed border-gray-200 overflow-hidden">
+            <div className="text-4xl mb-3">🔍</div>
+            <p className="font-black text-navy text-lg mb-2">{t("store_no_match_title")}</p>
+            <p className="text-gray-500 text-sm max-w-sm mx-auto mb-4">{t("store_no_match_desc")}</p>
+            <button
+              onClick={() => {
+                setQuery("");
+                setCategory("all");
+              }}
+              className="text-xs font-bold text-teal hover:underline"
+            >
+              {t("store_clear_filters")}
+            </button>
+          </div>
+        )
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
           {filtered.map((d) => {
