@@ -67,6 +67,7 @@ export default function Upload() {
   const [multiColor, setMultiColor] = useState(false);
   const [error, setError] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [success, setSuccess] = useState(false);
 
   if (authLoading) return <p>{t("dash_loading")}</p>;
 
@@ -172,10 +173,10 @@ export default function Upload() {
 
       if (insertError) throw insertError;
 
-      router.push("/store");
+      setSuccess(true);
+      setTimeout(() => router.push("/store"), 1400);
     } catch (err) {
       setError(err.message);
-    } finally {
       setUploading(false);
     }
   }
@@ -294,13 +295,14 @@ export default function Upload() {
         </div>
 
         {error && <p className="text-red-600 text-sm">{error}</p>}
+        {success && <p className="text-teal text-sm font-bold">{t("upload_success")}</p>}
 
         <button
           type="submit"
-          disabled={uploading}
+          disabled={uploading || success}
           className="w-full bg-teal text-white py-2.5 rounded-lg font-bold hover:opacity-90 disabled:opacity-50"
         >
-          {uploading ? t("upload_uploading") : t("upload_submit")}
+          {success ? t("upload_success_short") : uploading ? t("upload_uploading") : t("upload_submit")}
         </button>
       </form>
     </div>
