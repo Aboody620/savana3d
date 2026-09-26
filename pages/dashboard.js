@@ -29,6 +29,7 @@ export default function Dashboard() {
   const [designs, setDesigns] = useState([]);
   const [loadingData, setLoadingData] = useState(true);
   const [trackingInputs, setTrackingInputs] = useState({});
+  const [deletingId, setDeletingId] = useState(null);
 
   useEffect(() => {
     if (!user || !profile) return;
@@ -70,10 +71,19 @@ export default function Dashboard() {
   }, [user, profile]);
 
   async function acceptOrder(orderId) {
-    await supabase
+    // نحدّث بس لو الطلب لسا pending — يمنع طابعَين يقبلون نفس الطلب بنفس اللحظة
+    const { data, error } = await supabase
       .from("orders")
       .update({ printer_id: user.id, status: "accepted" })
-      .eq("id", orderId);
+      .eq("id", orderId)
+      .eq("status", "pending")
+      .select();
+
+    if (error || !data || data.length === 0) {
+      alert(t("dash_order_taken"));
+      setOrders((prev) => prev.filter((o) => o.id !== orderId));
+      return;
+    }
 
     setOrders((prev) =>
       prev.map((o) =>
@@ -102,6 +112,18 @@ export default function Dashboard() {
       return;
     }
     updateStatus(orderId, "shipped", { tracking_number: trackingNumber });
+  }
+
+  async function deleteDesign(designId) {
+    if (!window.confirm(t("dash_delete_confirm"))) return;
+    setDeletingId(designId);
+    const { error } = await supabase.from("designs").delete().eq("id", designId);
+    setDeletingId(null);
+    if (error) {
+      alert(t("dash_delete_error"));
+      return;
+    }
+    setDesigns((prev) => prev.filter((d) => d.id !== designId));
   }
 
   if (authLoading) return <p className="text-center">{t("dash_loading")}</p>;
@@ -238,11 +260,12 @@ export default function Dashboard() {
         <div className="space-y-4">
           {designs.length === 0 && <p className="text-gray-600">{t("dash_no_designs")}</p>}
           {designs.map((d) => (
-            <div key={d.id} className="bg-white p-4 rounded-xl shadow-sm flex justify-between items-center">
+            <div key={d.id} className="bg-white p-4 rounded-xl shadow-sm flex justify-between items-center gap-3">
               <div>
                 <p className="font-bold">{d.title}</p>
                 <p className="text-sm text-gray-500">{d.price} {t("riyal")}</p>
               </div>
+              <div className="flex items-center gap-2 shrink-0">
               {d.file_url && (
                 <a
                   href={d.file_url}
@@ -254,6 +277,14 @@ export default function Dashboard() {
                   {t("dash_download_file")}
                 </a>
               )}
+              <button
+                onClick={() => deleteDesign(d.id)}
+                disabled={deletingId === d.id}
+                className="text-red-600 text-sm px-3 py-1.5 rounded-lg hover:bg-red-50 disabled:opacity-50 whitespace-nowrap"
+              >
+                {deletingId === d.id ? t("dash_deleting") : t("dash_delete_design")}
+              </button>
+              </div>
             </div>
           ))}
         </div>
