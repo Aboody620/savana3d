@@ -9,6 +9,16 @@ export default function Dashboard() {
   const { lang } = useLanguage();
   const t = getT(lang);
 
+  const STATUS_BADGE_CLASS = {
+    pending_payment: "bg-gray-200 text-gray-600",
+    pending: "bg-amber-100 text-amber-700",
+    accepted: "bg-blue-100 text-blue-700",
+    printing: "bg-blue-100 text-blue-700",
+    shipped: "bg-teal/10 text-teal",
+    completed: "bg-green-100 text-green-700",
+    cancelled: "bg-red-100 text-red-600",
+  };
+
   const STATUS_LABELS = {
     pending_payment: t("status_pending_payment"),
     pending: t("status_pending"),
@@ -163,12 +173,17 @@ export default function Dashboard() {
             <div key={o.id} className="bg-white p-4 rounded-xl shadow-sm">
               <div className="flex justify-between items-center mb-2">
                 <p className="font-bold">{o.designs?.title || t("dash_custom_design")}</p>
-                <span className="bg-navy text-white text-xs px-3 py-1 rounded-full">
+                <span
+                  className={`text-xs px-3 py-1 rounded-full font-bold ${
+                    STATUS_BADGE_CLASS[o.status] || "bg-navy text-white"
+                  }`}
+                >
                   {STATUS_LABELS[o.status]}
                 </span>
               </div>
               <p className="text-sm text-gray-500">
-                {o.total_price} {t("riyal")} + {t("cart_shipping")} {o.shipping_cost} {t("riyal")}
+                {o.total_price} {t("riyal")}
+                {o.shipping_cost > 0 && ` + ${t("cart_shipping")} ${o.shipping_cost} ${t("riyal")}`}
               </p>
               {o.shipping_city && (
                 <p className="text-sm text-gray-500 mt-1">
