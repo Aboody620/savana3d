@@ -14,7 +14,12 @@ export default function OrderSuccess() {
   const [status, setStatus] = useState("verifying"); // verifying | success | failed
 
   useEffect(() => {
-    if (!orderIdsParam || !paymentId) return;
+    if (!orderIdsParam || !paymentId) {
+      // ما وصلنا معاملات كافية بالرابط (مثلاً المستخدم فتح الصفحة مباشرة
+      // أو انقطع الاتصال قبل ما موياسر يكمل التحويل) — ما نسيبه معلّق للأبد
+      if (router.isReady) setStatus("failed");
+      return;
+    }
 
     const orderIds = orderIdsParam.split(",").filter(Boolean);
 
@@ -38,7 +43,7 @@ export default function OrderSuccess() {
     }
 
     verify();
-  }, [orderIdsParam, paymentId]);
+  }, [orderIdsParam, paymentId, router.isReady]);
 
   return (
     <div className="max-w-md mx-auto bg-white p-8 rounded-2xl shadow-sm text-center">
