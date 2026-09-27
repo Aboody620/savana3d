@@ -72,6 +72,27 @@ export default function Cart() {
     setCreatingOrder(true);
 
     try {
+      // نتأكد أول شي إن كل عناصر السلة لسا موجودة فعليًا (يحصل نادرًا لو
+      // المصمم حذف تصميمه بعد ما ضافه زبون لسلته) — عشان ما يطلع خطأ
+      // تقني غامض من قاعدة البيانات بدل رسالة مفهومة
+      const cartIds = items.map((i) => i.id);
+      const { data: liveDesigns, error: checkError } = await supabase
+        .from("designs")
+        .select("id")
+        .in("id", cartIds);
+
+      if (checkError) throw checkError;
+
+      const liveIds = new Set((liveDesigns || []).map((d) => d.id));
+      const missingItems = items.filter((i) => !liveIds.has(i.id));
+
+      if (missingItems.length > 0) {
+        missingItems.forEach((i) => removeFromCart(i.id));
+        setError(t("cart_items_removed_error"));
+        setCreatingOrder(false);
+        return;
+      }
+
       // كل عنصر بالسلة يصير طلب مستقل، وتكلفة الشحن كاملة تُحسب على أول طلب فقط
       // (عشان المجموع الكلي يطابق مبلغ الدفع الواحد بالضبط)
       const rows = items.map((item, index) => ({
