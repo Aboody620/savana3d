@@ -11,11 +11,15 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [unconfirmed, setUnconfirmed] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [resendStatus, setResendStatus] = useState("idle"); // idle | sending | sent | error
 
   async function handleLogin(e) {
     e.preventDefault();
     setError("");
+    setUnconfirmed(false);
+    setResendStatus("idle");
     setLoading(true);
 
     const { error: loginError } = await supabase.auth.signInWithPassword({
@@ -26,11 +30,30 @@ export default function Login() {
     setLoading(false);
 
     if (loginError) {
-      setError(t("login_error"));
+      // Supabase يرجّع هذا الخطأ تحديدًا لما يكون الإيميل صحيح وكلمة المرور صحيحة
+      // بس المستخدم ما أكّد بريده بعد — لازم نميّزه عن خطأ "بيانات دخول خاطئة"
+      const isUnconfirmed =
+        loginError.code === "email_not_confirmed" ||
+        /email not confirmed/i.test(loginError.message || "");
+
+      if (isUnconfirmed) {
+        setUnconfirmed(true);
+      } else {
+        setError(t("login_error"));
+      }
       return;
     }
 
     router.push("/dashboard");
+  }
+
+  async function handleResend() {
+    setResendStatus("sending");
+    const { error: resendError } = await supabase.auth.resend({
+      type: "signup",
+      email,
+    });
+    setResendStatus(resendError ? "error" : "sent");
   }
 
   return (
@@ -61,6 +84,28 @@ export default function Login() {
         </div>
 
         {error && <p className="text-red-600 text-sm">{error}</p>}
+
+        {unconfirmed && (
+          <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-sm text-amber-800 space-y-2">
+            <p>{t("login_error_unconfirmed")}</p>
+            <button
+              type="button"
+              onClick={handleResend}
+              disabled={resendStatus === "sending" || resendStatus === "sent"}
+              className="font-bold text-navy underline disabled:opacity-60"
+            >
+              {resendStatus === "sending"
+                ? t("login_resend_sending")
+                : t("login_resend_confirmation")}
+            </button>
+            {resendStatus === "sent" && (
+              <p className="text-teal font-medium">{t("login_resend_sent")}</p>
+            )}
+            {resendStatus === "error" && (
+              <p className="text-red-600 font-medium">{t("login_resend_error")}</p>
+            )}
+          </div>
+        )}
 
         <button
           type="submit"
