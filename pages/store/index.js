@@ -259,6 +259,8 @@ export default function Store() {
                     <img
                       src={d.preview_image_url}
                       alt={d.title}
+                      loading="lazy"
+                      decoding="async"
                       className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                   ) : (

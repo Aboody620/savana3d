@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
+import Head from "next/head";
 import { clearCart } from "../lib/cart";
 import { useLanguage } from "../lib/LanguageContext";
 import { getT } from "../lib/translations";
@@ -47,6 +48,9 @@ export default function OrderSuccess() {
 
   return (
     <div className="max-w-md mx-auto bg-white p-8 rounded-2xl shadow-sm text-center">
+      <Head>
+        <meta name="robots" content="noindex,nofollow" />
+      </Head>
       {status === "verifying" && (
         <>
           <div className="text-5xl mb-4">⏳</div>

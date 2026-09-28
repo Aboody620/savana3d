@@ -148,6 +148,20 @@ export default function CustomOrder() {
   return (
     <>
       <Head>
+        <title>
+          {lang === "ar"
+            ? "اطلب طباعة تصميمك الخاص | Savana3D"
+            : "Order a Custom 3D Print | Savana3D"}
+        </title>
+        <meta
+          name="description"
+          content={
+            lang === "ar"
+              ? "ارفع ملف تصميمك الخاص (STL/OBJ/3MF) واطلب طباعته بجودة عالية — يوصلك مطبوعًا لباب بيتك عبر شبكة أصحاب الطابعات في Savana3D."
+              : "Upload your own design file (STL/OBJ/3MF) and get it printed in high quality — delivered to your door through Savana3D's printer network."
+          }
+        />
+        <link rel="canonical" href="https://savana3d.com/custom-order" />
         <link href="https://cdn.moyasar.com/mpf/1.14.0/moyasar.css" rel="stylesheet" />
       </Head>
       <Script src="https://cdn.moyasar.com/mpf/1.14.0/moyasar.js" onLoad={() => setMoyasarReady(true)} />

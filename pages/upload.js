@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
+import Head from "next/head";
 import { supabase } from "../lib/supabaseClient";
 import { useAuth } from "../lib/useAuth";
 import { useLanguage } from "../lib/LanguageContext";
@@ -183,6 +184,9 @@ export default function Upload() {
 
   return (
     <div className="max-w-lg mx-auto bg-white p-8 rounded-xl shadow-sm">
+      <Head>
+        <meta name="robots" content="noindex,nofollow" />
+      </Head>
       <h1 className="text-2xl font-bold text-navy mb-6">{t("upload_title")}</h1>
 
       <form onSubmit={handleUpload} className="space-y-4">

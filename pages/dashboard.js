@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import Head from "next/head";
 import { useAuth } from "../lib/useAuth";
 import { supabase } from "../lib/supabaseClient";
 import { useLanguage } from "../lib/LanguageContext";
@@ -158,6 +159,9 @@ export default function Dashboard() {
 
   return (
     <div>
+      <Head>
+        <meta name="robots" content="noindex,nofollow" />
+      </Head>
       <h1 className="text-2xl font-bold text-navy mb-6">
         {t("dash_title")} — {profile?.full_name}{" "}
         <span className="text-sm text-gray-500">

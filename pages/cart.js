@@ -143,6 +143,7 @@ export default function Cart() {
   return (
     <>
       <Head>
+        <meta name="robots" content="noindex,nofollow" />
         <link href="https://cdn.moyasar.com/mpf/1.14.0/moyasar.css" rel="stylesheet" />
       </Head>
       <Script src="https://cdn.moyasar.com/mpf/1.14.0/moyasar.js" onLoad={() => setMoyasarReady(true)} />
@@ -157,7 +158,7 @@ export default function Cart() {
                 <div className="h-16 w-16 rounded-lg bg-[#EEF2F6] overflow-hidden flex-shrink-0">
                   {item.preview_image_url && (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={item.preview_image_url} alt={item.title} className="h-full w-full object-cover" />
+                    <img src={item.preview_image_url} alt={item.title} loading="lazy" decoding="async" className="h-full w-full object-cover" />
                   )}
                 </div>
                 <div className="flex-1 min-w-0">

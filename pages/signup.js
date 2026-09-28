@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Head from "next/head";
 import { supabase } from "../lib/supabaseClient";
 import { useLanguage } from "../lib/LanguageContext";
 import { getT } from "../lib/translations";
@@ -52,6 +53,9 @@ export default function Signup() {
 
   return (
     <div className="max-w-md mx-auto bg-white p-8 rounded-xl shadow-sm">
+      <Head>
+        <meta name="robots" content="noindex,nofollow" />
+      </Head>
       <h1 className="text-2xl font-bold text-navy mb-6">{t("signup_title")}</h1>
 
       <form onSubmit={handleSignup} className="space-y-4">

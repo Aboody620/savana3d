@@ -26,7 +26,7 @@ function AppShell({ Component, pageProps }) {
         <div className="max-w-5xl mx-auto px-4 grid grid-cols-1 sm:grid-cols-3 gap-8 text-right">
           <div>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo.svg" alt="Savana3D" className="h-8 mb-3 ms-auto" />
+            <img src="/logo.svg" alt="Savana3D" loading="lazy" decoding="async" className="h-8 mb-3 ms-auto" />
             <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
               {t("footer_about_text")}
             </p>
