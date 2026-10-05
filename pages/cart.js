@@ -8,6 +8,7 @@ import { useAuth } from "../lib/useAuth";
 import { getCart, removeFromCart, updateQuantity, getCartSubtotal } from "../lib/cart";
 import { useLanguage } from "../lib/LanguageContext";
 import { getT } from "../lib/translations";
+import { getPublishableKey, paymentKeyIsConfigured, paymentUnavailableMessage } from "../lib/paymentConfig";
 
 const SHIPPING_COST = 25; // تكلفة شحن ثابتة للسلة كاملة بالمرحلة الأولى
 
@@ -48,8 +49,8 @@ export default function Cart() {
       amount: Math.round(activeCheckout.total * 100),
       currency: "SAR",
       description: `طلب Savana3D — ${activeCheckout.orderIds.length} منتج`,
-      publishable_api_key: process.env.NEXT_PUBLIC_MOYASAR_PUBLISHABLE_KEY,
-      callback_url: `${process.env.NEXT_PUBLIC_SITE_URL}/order-success?order_ids=${activeCheckout.orderIds.join(",")}`,
+      publishable_api_key: getPublishableKey(),
+      callback_url: `${window.location.origin}/order-success?order_ids=${activeCheckout.orderIds.join(",")}`,
       supported_networks: ["mada", "visa", "mastercard"],
       methods: ["creditcard"],
     });
@@ -69,6 +70,10 @@ export default function Cart() {
   async function handleCreateOrders(e) {
     e.preventDefault();
     setError("");
+    if (!paymentKeyIsConfigured(getPublishableKey()) || !moyasarReady) {
+      setError(paymentUnavailableMessage(lang));
+      return;
+    }
     setCreatingOrder(true);
 
     try {
@@ -146,7 +151,7 @@ export default function Cart() {
         <meta name="robots" content="noindex,nofollow" />
         <link href="https://cdn.moyasar.com/mpf/1.14.0/moyasar.css" rel="stylesheet" />
       </Head>
-      <Script src="https://cdn.moyasar.com/mpf/1.14.0/moyasar.js" onLoad={() => setMoyasarReady(true)} />
+      <Script src="https://cdn.moyasar.com/mpf/1.14.0/moyasar.js" onReady={() => setMoyasarReady(true)} onError={() => setError(paymentUnavailableMessage(lang))} />
 
       <div className="max-w-2xl mx-auto">
         <h1 className="text-2xl font-bold text-navy mb-6">{t("cart_title")}</h1>

@@ -6,6 +6,7 @@ import { supabase } from "../lib/supabaseClient";
 import { useAuth } from "../lib/useAuth";
 import { useLanguage } from "../lib/LanguageContext";
 import { getT } from "../lib/translations";
+import { getPublishableKey, paymentKeyIsConfigured, paymentUnavailableMessage } from "../lib/paymentConfig";
 
 const SHIPPING_COST = 25;
 
@@ -48,8 +49,8 @@ export default function CustomOrder() {
       amount: Math.round(activeCheckout.total * 100),
       currency: "SAR",
       description: `طلب تصميم مخصص Savana3D`,
-      publishable_api_key: process.env.NEXT_PUBLIC_MOYASAR_PUBLISHABLE_KEY,
-      callback_url: `${process.env.NEXT_PUBLIC_SITE_URL}/order-success?order_ids=${activeCheckout.orderId}`,
+      publishable_api_key: getPublishableKey(),
+      callback_url: `${window.location.origin}/order-success?order_ids=${activeCheckout.orderId}`,
       supported_networks: ["mada", "visa", "mastercard"],
       methods: ["creditcard"],
     });
@@ -81,6 +82,10 @@ export default function CustomOrder() {
   async function handleSubmit(e) {
     e.preventDefault();
     setError("");
+    if (!paymentKeyIsConfigured(getPublishableKey()) || !moyasarReady) {
+      setError(paymentUnavailableMessage(lang));
+      return;
+    }
 
     const fileErrorKey = validateDesignFile(file);
     if (fileErrorKey) {
@@ -164,7 +169,7 @@ export default function CustomOrder() {
         <link rel="canonical" href="https://savana3d.com/custom-order" />
         <link href="https://cdn.moyasar.com/mpf/1.14.0/moyasar.css" rel="stylesheet" />
       </Head>
-      <Script src="https://cdn.moyasar.com/mpf/1.14.0/moyasar.js" onLoad={() => setMoyasarReady(true)} />
+      <Script src="https://cdn.moyasar.com/mpf/1.14.0/moyasar.js" onReady={() => setMoyasarReady(true)} onError={() => setError(paymentUnavailableMessage(lang))} />
 
       <div className="max-w-lg mx-auto bg-white p-8 rounded-xl shadow-sm">
         <h1 className="text-2xl font-bold text-navy mb-2">
