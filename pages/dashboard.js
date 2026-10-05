@@ -4,6 +4,7 @@ import { useAuth } from "../lib/useAuth";
 import { supabase } from "../lib/supabaseClient";
 import { useLanguage } from "../lib/LanguageContext";
 import { getT } from "../lib/translations";
+import OrderPickupForm from "../components/OrderPickupForm";
 
 export default function Dashboard() {
   const { user, profile, loading: authLoading, profileError } = useAuth();
@@ -104,20 +105,31 @@ export default function Dashboard() {
   }
 
   async function updateStatus(orderId, newStatus, extraFields = {}) {
-    await supabase
+    const current = orders.find((order) => order.id === orderId);
+    if (!current || current.printer_id !== user.id) return;
+    const { data, error } = await supabase
       .from("orders")
       .update({ status: newStatus, ...extraFields })
-      .eq("id", orderId);
+      .eq("id", orderId)
+      .eq("printer_id", user.id)
+      .eq("status", current.status)
+      .select()
+      .maybeSingle();
+
+    if (error || !data) {
+      alert(lang === "en" ? "Could not save the order status. Refresh and try again." : "تعذر حفظ حالة الطلب. حدّث الصفحة وحاول مجددًا.");
+      return;
+    }
 
     setOrders((prev) =>
       prev.map((o) =>
-        o.id === orderId ? { ...o, status: newStatus, ...extraFields } : o
+        o.id === orderId ? { ...o, ...data } : o
       )
     );
   }
 
   function handleShip(orderId) {
-    const trackingNumber = trackingInputs[orderId];
+    const trackingNumber = (trackingInputs[orderId] || "").trim();
     if (!trackingNumber) {
       alert(t("dash_tracking_placeholder"));
       return;
@@ -242,6 +254,10 @@ export default function Dashboard() {
                 >
                   {t("dash_start_printing")}
                 </button>
+              )}
+
+              {o.printer_id === user.id && o.status === "printing" && (
+                <OrderPickupForm orderId={o.id} lang={lang} />
               )}
 
               {o.printer_id === user.id && o.status === "printing" && (
