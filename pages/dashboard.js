@@ -42,6 +42,7 @@ export default function Dashboard() {
   const [loadingData, setLoadingData] = useState(true);
   const [trackingInputs, setTrackingInputs] = useState({});
   const [deletingId, setDeletingId] = useState(null);
+  const [downloadingId, setDownloadingId] = useState(null);
 
   useEffect(() => {
     if (!user || !profile) return;
@@ -137,6 +138,27 @@ export default function Dashboard() {
     updateStatus(orderId, "shipped", { tracking_number: trackingNumber });
   }
 
+  // الملفات خاصة؛ نطلب رابط تحميل مؤقت من السيرفر
+  async function downloadFile(target) {
+    const key = target.orderId || target.designId;
+    setDownloadingId(key);
+    try {
+      const { data } = await supabase.auth.getSession();
+      const response = await fetch("/api/files/download", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${data.session?.access_token || ""}` },
+        body: JSON.stringify(target),
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || !result.url) throw new Error(result.error);
+      window.location.href = result.url;
+    } catch (err) {
+      alert(err.message || (lang === "en" ? "Could not download the file." : "تعذر تحميل الملف"));
+    } finally {
+      setDownloadingId(null);
+    }
+  }
+
   async function deleteDesign(designId) {
     if (!window.confirm(t("dash_delete_confirm"))) return;
     setDeletingId(designId);
@@ -209,7 +231,18 @@ export default function Dashboard() {
               {o.tracking_number && (
                 <p className="text-sm text-teal font-bold mt-1">
                   {t("dash_tracking_number")}: {o.tracking_number}
+                  {o.shipping_carrier && ` (${o.shipping_carrier})`}
                 </p>
+              )}
+              {o.tracking_url && (
+                <a
+                  href={o.tracking_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block mt-2 text-sm bg-teal text-white px-4 py-1.5 rounded-lg"
+                >
+                  {t("dash_track_shipment")}
+                </a>
               )}
             </div>
           ))}
@@ -228,7 +261,23 @@ export default function Dashboard() {
                   {STATUS_LABELS[o.status]}
                 </span>
               </div>
-              <p className="text-sm text-gray-500 mb-1">{o.total_price} {t("riyal")}</p>
+              <p className="text-sm text-gray-500 mb-1">
+                {o.total_price} {t("riyal")}
+                {o.quantity > 1 && ` — ${t("dash_quantity")}: ${o.quantity}`}
+              </p>
+
+              {o.printer_id === user.id && (
+                <button
+                  onClick={() => downloadFile({ orderId: o.id })}
+                  disabled={downloadingId === o.id}
+                  className="inline-block mb-3 text-sm bg-navy text-white px-4 py-1.5 rounded-lg disabled:opacity-50"
+                >
+                  {downloadingId === o.id ? t("dash_loading") : t("dash_download_print_file")}
+                </button>
+              )}
+              {o.printer_id === user.id && o.notes && (
+                <p className="text-sm text-gray-600 mb-3">{t("dash_customer_notes")}: {o.notes}</p>
+              )}
 
               {o.printer_id === user.id && o.shipping_name && (
                 <div className="text-sm text-gray-600 bg-gray-50 rounded-lg p-3 mb-3">
@@ -256,8 +305,14 @@ export default function Dashboard() {
                 </button>
               )}
 
-              {o.printer_id === user.id && o.status === "printing" && (
+              {o.printer_id === user.id && o.status === "printing" && !o.oto_order_id && (
                 <OrderPickupForm orderId={o.id} lang={lang} />
+              )}
+              {o.printer_id === user.id && o.status === "printing" && o.oto_order_id && (
+                <p className="text-sm text-gray-600 bg-gray-50 rounded-lg p-3 my-3">
+                  {t("dash_oto_prepared")}: {o.oto_order_id}
+                  {o.shipping_status && ` — ${o.shipping_status}`}
+                </p>
               )}
 
               {o.printer_id === user.id && o.status === "printing" && (
@@ -302,15 +357,13 @@ export default function Dashboard() {
               </div>
               <div className="flex items-center gap-2 shrink-0">
               {d.file_url && (
-                <a
-                  href={d.file_url}
-                  download
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-navy text-white text-sm px-4 py-1.5 rounded-lg hover:opacity-90 whitespace-nowrap"
+                <button
+                  onClick={() => downloadFile({ designId: d.id })}
+                  disabled={downloadingId === d.id}
+                  className="bg-navy text-white text-sm px-4 py-1.5 rounded-lg hover:opacity-90 whitespace-nowrap disabled:opacity-50"
                 >
                   {t("dash_download_file")}
-                </a>
+                </button>
               )}
               <button
                 onClick={() => deleteDesign(d.id)}

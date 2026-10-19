@@ -22,7 +22,9 @@ export default function OrderPickupForm({ orderId, lang }) {
       const result = await response.json();
       if (!response.ok) throw new Error(result.error);
       setPrepared(true);
-      setMessage(en ? `Prepared in OTO: ${result.orderId}. A shipping label has not been purchased.` : `تم تجهيز الطلب في OTO: ${result.orderId}. لم تُشترَ بوليصة شحن بعد.`);
+      setMessage(result.shipmentRequested
+        ? (en ? `Shipment requested (${result.orderId}). The courier will contact you for pickup, and tracking will appear automatically.` : `تم طلب الشحنة (${result.orderId}). شركة الشحن بتتواصل معك للاستلام، ورقم التتبع بيظهر تلقائيًا.`)
+        : (en ? `Prepared in OTO: ${result.orderId}. The label will be issued from OTO, then tracking appears here.` : `تم تجهيز الطلب في OTO: ${result.orderId}. بتنصدر البوليصة من لوحة OTO، وبعدها يظهر رقم التتبع هنا.`));
     } catch (error) { setMessage(error.message || (en ? "Could not prepare shipping." : "تعذر تجهيز الشحن")); }
     finally { setBusy(false); }
   }
