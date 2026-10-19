@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import Link from 'next/link';
 import Head from "next/head";
 import { useAuth } from "../lib/useAuth";
 import { supabase } from "../lib/supabaseClient";
@@ -203,6 +204,7 @@ export default function Dashboard() {
         </span>
       </h1>
 
+      {['customer','printer'].includes(profile?.role) && <Link href="/quotes" className="block mb-6 bg-teal text-white rounded-xl p-4 font-bold">{lang === 'en' ? 'Print quotes — review before payment' : 'عروض الطباعة — مراجعة السعر قبل الدفع'}</Link>}
       {/* لوحة الزبون */}
       {profile?.role === "customer" && (
         <div className="space-y-4">
@@ -353,7 +355,7 @@ export default function Dashboard() {
             <div key={d.id} className="bg-white p-4 rounded-xl shadow-sm flex justify-between items-center gap-3">
               <div>
                 <p className="font-bold">{d.title}</p>
-                <p className="text-sm text-gray-500">{d.price} {t("riyal")}</p>
+                <p className="text-sm text-gray-500">{d.pricing_mode === 'quote' ? (lang === 'en' ? 'Designer share: 10%' : 'نصيب المصمم: ١٠٪') : `${d.price} ${t('riyal')}`}</p>
               </div>
               <div className="flex items-center gap-2 shrink-0">
               {d.file_url && (

@@ -26,7 +26,7 @@ export default async function handler(req, res) {
       const items = normalizeCartItems(body.items);
       const { data: designs, error } = await supabaseAdmin
         .from("designs")
-        .select("id, price, title")
+        .select("id, price, title, pricing_mode")
         .in("id", items.map((i) => i.id));
       if (error) throw new CheckoutError("تعذر قراءة المنتجات، حاول مرة ثانية", 503);
       built = buildStoreOrders({ customerId, items, designs, shipping: body.shipping });

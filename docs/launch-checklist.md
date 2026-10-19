@@ -4,6 +4,7 @@
 1. `supabase/migration_server_checkout.sql` — orders are created only by `/api/checkout` with database prices; payment status can only be changed by the server.
 2. `supabase/migration_oto_tracking.sql` — tracking columns written by the OTO webhook.
 3. `supabase/migration_private_design_files.sql` — makes the `designs` bucket private and lets customers upload custom-order files.
+4. `supabase/migration_print_quotes.sql` — print quote requests/offers, design image gallery, `pricing_mode` on designs.
 
 Then run the check query at the end of file 1 to find any order marked paid without a Moyasar reference.
 
