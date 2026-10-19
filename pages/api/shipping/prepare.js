@@ -42,7 +42,34 @@ export default async function handler(req, res) {
       // Never relay provider responses containing addresses or credentials to the browser.
       return res.status(502).json({ error: "لم يؤكد OTO إنشاء الطلب. راجع لوحة OTO بنفس رقم الطلب قبل إعادة المحاولة", orderId: payload.orderId });
     }
-    return res.status(200).json({ success: true, orderId: payload.orderId });
+    // حفظ رقم OTO ما يوقف العملية لو فشل — الطلب انشأ فعلًا في OTO
+    const markOrder = async (fields) => {
+      try { await supabaseAdmin.from("orders").update(fields).eq("id", order.id); }
+      catch (saveError) { console.error("oto save", saveError); }
+    };
+    await markOrder({ oto_order_id: payload.orderId, shipping_status: "prepared" });
+
+    // اختياري: طلب البوليصة تلقائيًا من OTO (يخصم من محفظة OTO حسب قاعدة الشركة
+    // المختارة في لوحة OTO). يتفعل بـ OTO_AUTO_SHIP=true في Vercel.
+    if (process.env.OTO_AUTO_SHIP === "true") {
+      try {
+        const shipResponse = await fetch("https://api.tryoto.com/rest/v2/createShipment", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${tokenData.access_token}` },
+          body: JSON.stringify({ orderId: payload.orderId }), signal: AbortSignal.timeout(20000),
+        });
+        const shipResult = await shipResponse.json().catch(() => ({}));
+        if (shipResponse.ok && shipResult.success !== false) {
+          await markOrder({ shipping_status: "shipment_requested" });
+          return res.status(200).json({ success: true, orderId: payload.orderId, shipmentRequested: true });
+        }
+      } catch (shipError) {
+        console.error("oto createShipment", shipError);
+      }
+      // الطلب موجود في OTO، بس البوليصة ما انطلبت — تنطلب يدويًا من لوحة OTO
+      return res.status(200).json({ success: true, orderId: payload.orderId, shipmentRequested: false });
+    }
+    return res.status(200).json({ success: true, orderId: payload.orderId, shipmentRequested: false });
   } catch {
     return res.status(502).json({ error: "تعذر تأكيد تجهيز الشحن. راجع لوحة OTO قبل إعادة المحاولة" });
   }

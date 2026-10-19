@@ -9,8 +9,7 @@ import { getCart, removeFromCart, updateQuantity, getCartSubtotal } from "../lib
 import { useLanguage } from "../lib/LanguageContext";
 import { getT } from "../lib/translations";
 import { getPublishableKey, paymentKeyIsConfigured, paymentUnavailableMessage } from "../lib/paymentConfig";
-
-const SHIPPING_COST = 25; // تكلفة شحن ثابتة للسلة كاملة بالمرحلة الأولى
+import { SHIPPING_COST } from "../lib/checkout";
 
 export default function Cart() {
   const router = useRouter();
@@ -77,53 +76,35 @@ export default function Cart() {
     setCreatingOrder(true);
 
     try {
-      // نتأكد أول شي إن كل عناصر السلة لسا موجودة فعليًا (يحصل نادرًا لو
-      // المصمم حذف تصميمه بعد ما ضافه زبون لسلته) — عشان ما يطلع خطأ
-      // تقني غامض من قاعدة البيانات بدل رسالة مفهومة
-      const cartIds = items.map((i) => i.id);
-      const { data: liveDesigns, error: checkError } = await supabase
-        .from("designs")
-        .select("id")
-        .in("id", cartIds);
-
-      if (checkError) throw checkError;
-
-      const liveIds = new Set((liveDesigns || []).map((d) => d.id));
-      const missingItems = items.filter((i) => !liveIds.has(i.id));
-
-      if (missingItems.length > 0) {
-        missingItems.forEach((i) => removeFromCart(i.id));
-        setError(t("cart_items_removed_error"));
-        setCreatingOrder(false);
+      // السيرفر هو اللي ينشئ الطلبات ويحدد الأسعار من قاعدة البيانات
+      const { data: sessionData } = await supabase.auth.getSession();
+      if (!sessionData.session) {
+        router.push("/login");
         return;
       }
-
-      // كل عنصر بالسلة يصير طلب مستقل، وتكلفة الشحن كاملة تُحسب على أول طلب فقط
-      // (عشان المجموع الكلي يطابق مبلغ الدفع الواحد بالضبط)
-      const rows = items.map((item, index) => ({
-        customer_id: user.id,
-        design_id: item.id,
-        total_price: item.price * item.quantity,
-        shipping_cost: index === 0 ? SHIPPING_COST : 0,
-        status: "pending_payment",
-        payment_status: "unpaid",
-        shipping_name: shipping.name,
-        shipping_phone: shipping.phone,
-        shipping_city: shipping.city,
-        shipping_address: shipping.address,
-      }));
-
-      const { data: orders, error: insertError } = await supabase
-        .from("orders")
-        .insert(rows)
-        .select();
-
-      if (insertError) throw insertError;
-
-      setActiveCheckout({
-        orderIds: orders.map((o) => o.id),
-        total,
+      const response = await fetch("/api/checkout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${sessionData.session.access_token}`,
+        },
+        body: JSON.stringify({
+          type: "store",
+          items: items.map((i) => ({ id: i.id, quantity: i.quantity })),
+          shipping,
+        }),
       });
+      const result = await response.json().catch(() => ({}));
+
+      if (response.status === 409 && Array.isArray(result.missing) && result.missing.length) {
+        // منتج انحذف بعد ما انضاف للسلة
+        result.missing.forEach((id) => removeFromCart(id));
+        setError(t("cart_items_removed_error"));
+        return;
+      }
+      if (!response.ok) throw new Error(result.error || t("cart_checkout_failed"));
+
+      setActiveCheckout({ orderIds: result.orderIds, total: result.total });
     } catch (err) {
       setError(err.message);
     } finally {
@@ -285,7 +266,10 @@ export default function Cart() {
 
         {activeCheckout && (
           <div className="bg-white rounded-2xl shadow-sm p-6">
-            <h2 className="font-bold text-navy mb-4">{t("cart_complete_payment")}</h2>
+            <h2 className="font-bold text-navy mb-2">{t("cart_complete_payment")}</h2>
+            <p className="text-sm text-gray-600 mb-4">
+              {t("cart_amount_due")}: <span className="font-bold text-navy">{Number(activeCheckout.total).toFixed(2)} {t("riyal")}</span>
+            </p>
             <div className="mysr-form"></div>
           </div>
         )}
