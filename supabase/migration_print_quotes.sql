@@ -32,6 +32,13 @@ create table if not exists print_quotes (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+-- قواعد البيانات اللي انشأ فيها الجدول بنسخة سابقة: نكمّل الأعمدة والقيود الناقصة
+alter table print_quotes add column if not exists offered_at timestamptz;
+alter table print_quotes add column if not exists updated_at timestamptz not null default now();
+alter table print_quotes drop constraint if exists print_quotes_material_check;
+alter table print_quotes add constraint print_quotes_material_check check (material in ('PLA', 'PETG', 'ABS', 'Resin'));
+alter table orders add column if not exists designer_commission numeric;
+
 create index if not exists print_quotes_customer_idx on print_quotes (customer_id, created_at desc);
 create index if not exists print_quotes_status_idx on print_quotes (status, created_at desc);
 
@@ -44,15 +51,18 @@ alter table print_quotes enable row level security;
 -- القراءة: الزبون طلباته، وصاحب الطابعة الطلبات المفتوحة أو اللي سعّرها هو.
 -- التعديل والإضافة فقط عبر الدوال تحت أو السيرفر (ما فيه سياسات insert/update).
 drop policy if exists "quotes_customer_select" on print_quotes;
-create policy "quotes_customer_select" on print_quotes for select
-  using (auth.uid() = customer_id);
-
 drop policy if exists "quotes_printer_select" on print_quotes;
-create policy "quotes_printer_select" on print_quotes for select
+drop policy if exists "Quote participants read" on print_quotes;
+create policy "Quote participants read" on print_quotes for select
   using (
-    exists (select 1 from profiles p where p.id = auth.uid() and p.role = 'printer')
-    and (status = 'open' or printer_id = auth.uid())
+    customer_id = auth.uid() or printer_id = auth.uid()
+    or (status = 'open' and exists (select 1 from profiles where id = auth.uid() and role = 'printer'))
   );
+
+-- نسخ سابقة من الدوال بتواقيع مختلفة تنحذف عشان ينفع create or replace
+drop function if exists request_print_quote(uuid, integer, text, text, text, text);
+drop function if exists offer_print_quote(uuid, numeric, numeric);
+drop function if exists decline_print_quote(uuid);
 
 -- 3) الزبون يطلب سعر
 create or replace function request_print_quote(
@@ -74,7 +84,7 @@ begin
     raise exception 'وصلت للحد اليومي لطلبات التسعير';
   end if;
   insert into print_quotes (customer_id, design_id, quantity, material, color, city, notes)
-  values (auth.uid(), p_design, p_quantity, p_material, btrim(p_color), btrim(p_city), nullif(btrim(coalesce(p_notes, '')), ''))
+  values (auth.uid(), p_design, p_quantity, p_material, btrim(p_color), btrim(p_city), btrim(coalesce(p_notes, '')))
   returning id into v_id;
   return v_id;
 end;
@@ -116,7 +126,61 @@ grant execute on function request_print_quote(uuid, integer, text, text, text, t
 grant execute on function offer_print_quote(uuid, numeric, numeric) to authenticated;
 grant execute on function decline_print_quote(uuid) to authenticated;
 
--- 6) رفع صور المعاينة: المصمم يرفع في مجلده داخل bucket "previews"
+-- 6) الموافقة على العرض — تُنادى من السيرفر فقط (/api/accept-quote) بعد التحقق من الجوال
+--    تنشئ طلب بانتظار الدفع بسعر الطابع المحفوظ، ونصيب المصمم 10٪ من سعر المنتج
+create or replace function accept_print_quote(p_id uuid, p_customer uuid, p_name text, p_phone text, p_address text)
+returns uuid as $$
+declare q print_quotes; result uuid;
+begin
+  if coalesce(auth.role(), '') <> 'service_role' then raise exception 'Server authorization required'; end if;
+  select * into q from print_quotes where id = p_id and customer_id = p_customer for update;
+  if not found then raise exception 'Request not found'; end if;
+  if q.status = 'accepted' then return q.order_id; end if;
+  if q.status <> 'offered' then raise exception 'Offer required before payment'; end if;
+  if nullif(trim(p_name), '') is null or nullif(trim(p_phone), '') is null or nullif(trim(p_address), '') is null
+     or length(p_name) > 200 or length(p_phone) > 30 or length(p_address) > 1000 then
+    raise exception 'Delivery details required';
+  end if;
+  insert into orders (customer_id, design_id, printer_id, total_price, shipping_cost, status, payment_status,
+                      shipping_name, shipping_phone, shipping_city, shipping_address, notes, designer_commission, quantity)
+  values (q.customer_id, q.design_id, q.printer_id, q.product_price, q.shipping_price, 'pending_payment', 'unpaid',
+          trim(p_name), trim(p_phone), q.city, trim(p_address),
+          'Quantity: ' || q.quantity || '; Material: ' || q.material || '; Color: ' || q.color || '; ' || coalesce(q.notes, ''),
+          round(q.product_price * 0.10, 2), q.quantity)
+  returning id into result;
+  update print_quotes set status = 'accepted', order_id = result where id = q.id;
+  return result;
+end;
+$$ language plpgsql security definer set search_path = public;
+revoke all on function accept_print_quote(uuid, uuid, text, text, text) from public, anon, authenticated;
+
+-- طلبات العروض: السعر والطابع ثابتين، والحالات تمشي بالترتيب فقط
+create or replace function protect_quote_order()
+returns trigger as $$
+begin
+  if exists (select 1 from print_quotes where order_id = old.id) and coalesce(auth.role(), '') <> 'service_role' then
+    if new.total_price is distinct from old.total_price or new.shipping_cost is distinct from old.shipping_cost
+       or new.designer_commission is distinct from old.designer_commission or new.printer_id is distinct from old.printer_id
+       or new.payment_status is distinct from old.payment_status or new.payment_reference is distinct from old.payment_reference
+       or new.customer_id is distinct from old.customer_id or new.design_id is distinct from old.design_id then
+      raise exception 'Quote payment and allocation cannot be changed';
+    end if;
+    if new.status is distinct from old.status and not (
+      old.payment_status = 'paid' and (
+        (auth.uid() = old.printer_id and ((old.status = 'accepted' and new.status = 'printing') or (old.status = 'printing' and new.status = 'shipped')))
+        or (auth.uid() = old.customer_id and old.status = 'shipped' and new.status = 'completed')
+      )
+    ) then raise exception 'Invalid order transition'; end if;
+  end if;
+  return new;
+end;
+$$ language plpgsql security definer set search_path = public;
+
+drop trigger if exists protect_quote_order on orders;
+create trigger protect_quote_order before update on orders
+  for each row execute procedure protect_quote_order();
+
+-- 7) رفع صور المعاينة: المصمم يرفع في مجلده داخل bucket "previews"
 --    (السياسة موجودة في migration_storage_upload_policies.sql — هذا تأكيد لو ما انشغّل)
 drop policy if exists "savana_designer_upload_own_preview" on storage.objects;
 create policy "savana_designer_upload_own_preview"
@@ -127,7 +191,7 @@ with check (
   and exists (select 1 from public.profiles where id = (select auth.uid()) and role = 'designer')
 );
 
--- المصمم يقدر يحذف ملفاته اللي رفعها لو فشل النشر
+-- 8) المصمم يقدر يحذف ملفاته اللي رفعها لو فشل النشر
 drop policy if exists "savana_designer_delete_own_files" on storage.objects;
 create policy "savana_designer_delete_own_files"
 on storage.objects for delete to authenticated

@@ -13,7 +13,21 @@ const ids = {
   designer: "44444444-4444-4444-8444-444444444444",
 };
 
-async function setup() {
+// Mirrors what an earlier session created directly in production before this migration existed.
+const LEGACY = `
+  create table print_quotes (
+    id uuid primary key default gen_random_uuid(),
+    customer_id uuid not null references profiles(id), design_id uuid not null references designs(id),
+    printer_id uuid references profiles(id), quantity integer not null check (quantity between 1 and 100),
+    material text not null, color text not null, city text not null, notes text default '',
+    status text not null default 'open' check (status in ('open','offered','accepted','cancelled')),
+    product_price numeric, shipping_price numeric, order_id uuid references orders(id),
+    created_at timestamptz default now());
+  create function request_print_quote(p_design uuid, p_quantity integer, p_material text, p_color text, p_city text, p_notes text default '')
+    returns uuid language sql as $$ select null::uuid $$;
+`;
+
+async function setup({ legacy = false } = {}) {
   const db = new PGlite();
   await db.exec(`
     create role anon; create role authenticated; create role service_role;
@@ -33,8 +47,13 @@ async function setup() {
   // schema.sql references storage policies that need Supabase internals; keep only the public tables.
   const schema = (await sql("schema.sql")).split("-- Storage buckets")[0];
   await db.exec(schema);
+  if (legacy) {
+    await db.exec(await sql("migration_shipping_payment.sql"));
+    await db.exec(await sql("migration_moyasar.sql"));
+    await db.exec(LEGACY);
+  }
   for (const file of ["migration_shipping_payment.sql", "migration_moyasar.sql", "migration_server_checkout.sql",
-    "migration_oto_tracking.sql", "migration_print_quotes.sql"]) {
+    "migration_oto_tracking.sql", "migration_print_quotes.sql", "migration_print_quotes.sql"]) {
     await db.exec(await sql(file));
   }
   await db.exec(`
@@ -48,7 +67,9 @@ async function setup() {
 }
 
 const as = async (db, who) => {
-  await db.exec(`set test.uid = '${who ? ids[who] : ""}'; set test.role = '${who ? "authenticated" : ""}';`);
+  const role = who === "server" ? "service_role" : who ? "authenticated" : "";
+  const uid = who && who !== "server" ? ids[who] : "";
+  await db.exec(`set test.uid = '${uid}'; set test.role = '${role}';`);
 };
 
 test("quote flow: request, single printer offer, decline rules", async () => {
@@ -108,21 +129,54 @@ test("orders cannot be inserted or marked paid outside the server", async () => 
   await db.query("update orders set status = 'printing' where id = $1", [order.id]);
 });
 
+test("the migration upgrades the database version created by the earlier session", async () => {
+  const { db, designId } = await setup({ legacy: true });
+  await as(db, "customer");
+  const { rows: [{ request_print_quote: quoteId }] } =
+    await db.query("select request_print_quote($1, 1, 'PLA', 'red', 'Madinah', '')", [designId]);
+  assert.ok(quoteId);
+  await as(db, "printer");
+  await db.query("select offer_print_quote($1, 40, 15)", [quoteId]);
+  await as(db, null);
+  const { rows: [quote] } = await db.query("select status, offered_at from print_quotes where id = $1", [quoteId]);
+  assert.equal(quote.status, "offered");
+  assert.ok(quote.offered_at);
+});
+
+test("accepting a quote creates one unpaid order at the stored price, server only", async () => {
+  const { db, designId } = await setup();
+  await as(db, "customer");
+  const { rows: [{ request_print_quote: quoteId }] } =
+    await db.query("select request_print_quote($1, 3, 'PETG', 'black', 'Madinah', '10cm')", [designId]);
+  await as(db, "printer");
+  await db.query("select offer_print_quote($1, 90, 18.5)", [quoteId]);
+
+  const accept = (who) => as(db, who).then(() => db.query(
+    "select accept_print_quote($1, $2, 'عبدالإله', '966551234567', 'حي العزيزية') as id", [quoteId, ids.customer]));
+  await assert.rejects(accept("customer"), /Server authorization/);
+  const { rows: [{ id: orderId }] } = await accept("server");
+  const { rows: [{ id: again }] } = await accept("server");
+  assert.equal(again, orderId);
+
+  await as(db, null);
+  const { rows: orders } = await db.query("select * from orders");
+  assert.equal(orders.length, 1);
+  assert.equal(Number(orders[0].total_price), 90);
+  assert.equal(Number(orders[0].shipping_cost), 18.5);
+  assert.equal(Number(orders[0].designer_commission), 9);
+  assert.equal(orders[0].printer_id, ids.printer);
+  assert.equal(orders[0].status, "pending_payment");
+});
+
 const quoteSource = await readFile(new URL("../lib/quoteOrder.js", import.meta.url), "utf8");
-const { buildQuoteOrder } = await import(`data:text/javascript;base64,${Buffer.from(quoteSource).toString("base64")}`);
+const { quoteRecipient } = await import(`data:text/javascript;base64,${Buffer.from(quoteSource).toString("base64")}`);
 const checkoutSource = await readFile(new URL("../lib/checkout.js", import.meta.url), "utf8");
 const { validateShipping } = await import(`data:text/javascript;base64,${Buffer.from(checkoutSource).toString("base64")}`);
 
-test("approved quote becomes an order at the printer's stored price", () => {
-  const quote = { customer_id: "c", design_id: "d", printer_id: "p", quantity: 3, material: "PETG",
-    color: "black", notes: "10cm", city: "المدينة", product_price: "90", shipping_price: "18.5" };
-  const row = buildQuoteOrder(quote, { name: "عبدالإله", phone: "0551234567", address: "حي العزيزية شارع 12", total_price: 1 }, validateShipping);
-  assert.equal(row.total_price, 90);
-  assert.equal(row.shipping_cost, 18.5);
-  assert.equal(row.printer_id, "p");
-  assert.equal(row.shipping_city, "المدينة");
-  assert.equal(row.status, "pending_payment");
-  assert.match(row.notes, /PETG · black\n10cm/);
-  assert.throws(() => buildQuoteOrder(quote, { name: "x", phone: "1", address: "short" }, validateShipping));
-  assert.throws(() => buildQuoteOrder({ ...quote, product_price: null }, { name: "عبدالإله", phone: "0551234567", address: "حي العزيزية شارع 12" }, validateShipping));
+test("recipient details are validated before a quote is accepted", () => {
+  const quote = { city: "المدينة" };
+  assert.deepEqual(quoteRecipient(quote, { name: "عبدالإله", phone: "055 123 4567", address: "حي العزيزية شارع 12" }, validateShipping),
+    { p_name: "عبدالإله", p_phone: "966551234567", p_address: "حي العزيزية شارع 12" });
+  assert.throws(() => quoteRecipient(quote, { name: "عبدالإله", phone: "123", address: "حي العزيزية شارع 12" }, validateShipping));
+  assert.throws(() => quoteRecipient(quote, { name: "x", phone: "0551234567", address: "قصير" }, validateShipping));
 });
