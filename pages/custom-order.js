@@ -8,7 +8,7 @@ import { useLanguage } from "../lib/LanguageContext";
 import { getT } from "../lib/translations";
 import { getPublishableKey, paymentKeyIsConfigured, paymentUnavailableMessage } from "../lib/paymentConfig";
 
-const SHIPPING_COST = 25;
+import { MIN_CUSTOM_PRICE, MAX_CUSTOM_PRICE } from "../lib/checkout";
 
 const ALLOWED_DESIGN_EXTENSIONS = ["stl", "obj", "3mf", "step", "stp"];
 const MAX_DESIGN_FILE_SIZE = 50 * 1024 * 1024; // 50MB
@@ -94,11 +94,11 @@ export default function CustomOrder() {
     }
 
     const numericPrice = parseFloat(price);
-    if (!numericPrice || numericPrice <= 0) {
+    if (!numericPrice || numericPrice < MIN_CUSTOM_PRICE || numericPrice > MAX_CUSTOM_PRICE) {
       setError(
         lang === "en"
-          ? "Please enter a valid price"
-          : "الرجاء إدخال سعر صحيح"
+          ? `Enter a price between ${MIN_CUSTOM_PRICE} and ${MAX_CUSTOM_PRICE} SAR`
+          : `أدخل سعر بين ${MIN_CUSTOM_PRICE} و ${MAX_CUSTOM_PRICE} ريال`
       );
       return;
     }
@@ -119,30 +119,26 @@ export default function CustomOrder() {
         .from("designs")
         .getPublicUrl(filePath);
 
-      const total = numericPrice + SHIPPING_COST;
-
-      const { data: order, error: insertError } = await supabase
-        .from("orders")
-        .insert({
-          customer_id: user.id,
-          design_id: null,
-          custom_file_url: fileUrlData.publicUrl,
-          total_price: numericPrice,
-          shipping_cost: SHIPPING_COST,
-          status: "pending_payment",
-          payment_status: "unpaid",
+      const { data: sessionData } = await supabase.auth.getSession();
+      if (!sessionData.session) throw new Error(lang === "en" ? "Please sign in again." : "يرجى تسجيل الدخول مجددًا");
+      const response = await fetch("/api/checkout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${sessionData.session.access_token}`,
+        },
+        body: JSON.stringify({
+          type: "custom",
+          fileUrl: fileUrlData.publicUrl,
+          price: numericPrice,
           notes,
-          shipping_name: shipping.name,
-          shipping_phone: shipping.phone,
-          shipping_city: shipping.city,
-          shipping_address: shipping.address,
-        })
-        .select()
-        .single();
+          shipping,
+        }),
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.error || (lang === "en" ? "Could not create the order." : "تعذر إنشاء الطلب"));
 
-      if (insertError) throw insertError;
-
-      setActiveCheckout({ orderId: order.id, total });
+      setActiveCheckout({ orderId: result.orderIds[0], total: result.total });
     } catch (err) {
       setError(err.message);
     } finally {

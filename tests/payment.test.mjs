@@ -1,7 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
-import vm from "node:vm";
 
 const config = await readFile(new URL("../lib/paymentConfig.js", import.meta.url), "utf8");
 const { paymentKeyIsConfigured } = await import(`data:text/javascript;base64,${Buffer.from(config).toString("base64")}`);
@@ -12,11 +11,10 @@ test("checkout rejects missing and template credentials", () => {
   assert.equal(paymentKeyIsConfigured("  pk_test_AbC0123456789  "), true);
 });
 
-const source = (await readFile(new URL("../pages/api/verify-payment.js", import.meta.url), "utf8"))
-  .replace(/import .*?;\r?\n/, "")
-  .replace("export default async function handler", "async function handler");
+const confirmSource = await readFile(new URL("../lib/confirmPayment.js", import.meta.url), "utf8");
+const { confirmPayment } = await import(`data:text/javascript;base64,${Buffer.from(confirmSource).toString("base64")}`);
 
-async function runVerification({ failUpdate = false, initialStatus = "pending_payment", reference = "payment-1", callback = "https://www.savana3d.com/order-success?order_ids=order-1" } = {}) {
+async function runVerification({ failUpdate = false, initialStatus = "pending_payment", reference = "payment-1", callback = "https://www.savana3d.com/order-success?order_ids=order-1", amount = 2600 } = {}) {
   const order = { id: "order-1", total_price: 1, shipping_cost: 25,
     status: initialStatus, payment_status: initialStatus === "pending_payment" ? "unpaid" : "paid",
     payment_reference: initialStatus === "pending_payment" ? null : reference };
@@ -35,13 +33,11 @@ async function runVerification({ failUpdate = false, initialStatus = "pending_pa
     };
     return query;
   } };
-  const context = vm.createContext({ supabaseAdmin: admin, Buffer, URL, AbortSignal, process: { env: { MOYASAR_SECRET_KEY: "test", NEXT_PUBLIC_SITE_URL: "https://savana3d.com" } }, console,
-    fetch: async () => ({ ok: true, json: async () => ({ id: "payment-1", status: "paid", amount: 2600, currency: "SAR", callback_url: callback }) }) });
-  vm.runInContext(source, context);
-  const result = {};
-  const res = { status(code) { result.status = code; return res; }, json(body) { result.body = body; return res; } };
-  await context.handler({ method: "POST", body: { paymentId: "payment-1", orderIds: ["order-1"] } }, res);
-  return { result, order };
+  const fetchImpl = async () => ({ ok: true, json: async () => ({ id: "payment-1", status: "paid", amount, currency: "SAR", callback_url: callback }) });
+  const out = await confirmPayment({ admin, fetchImpl,
+    env: { MOYASAR_SECRET_KEY: "test", NEXT_PUBLIC_SITE_URL: "https://savana3d.com" },
+    paymentId: "payment-1", orderIds: ["order-1"] });
+  return { result: out, order };
 }
 
 test("successful payment is saved before reporting success", async () => {
@@ -73,4 +69,9 @@ test("a payment bound to another order cannot be replayed", async () => {
 test("a payment created for another site cannot confirm an order", async () => {
   const { result } = await runVerification({ callback: "https://example.com/order-success?order_ids=order-1" });
   assert.equal(result.status, 400);
+});
+test("a payment for a smaller amount does not confirm the order", async () => {
+  const { result, order } = await runVerification({ amount: 100 });
+  assert.equal(result.status, 400);
+  assert.equal(order.payment_status, "unpaid");
 });
