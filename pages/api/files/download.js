@@ -17,7 +17,7 @@ export default async function handler(req, res) {
     const { data: auth, error: authError } = await supabaseAdmin.auth.getUser(bearer);
     if (authError || !auth?.user) return res.status(401).json({ error: "يرجى تسجيل الدخول مجددًا" });
     const userId = auth.user.id;
-    const { orderId, designId } = req.body || {};
+    const { orderId, designId, quoteId } = req.body || {};
 
     let fileUrl = null;
     if (typeof designId === "string" && UUID.test(designId)) {
@@ -35,6 +35,15 @@ export default async function handler(req, res) {
         if (isPrinter) fileUrl = order.custom_file_url || order.designs?.file_url;
         else if (isOwnCustomFile) fileUrl = order.custom_file_url;
       }
+    } else if (typeof quoteId === "string" && UUID.test(quoteId)) {
+      // صاحب الطابعة يحمّل الملف عشان يقيّمه قبل ما يرسل السعر
+      const [{ data: profile }, { data: quote }] = await Promise.all([
+        supabaseAdmin.from("profiles").select("role").eq("id", userId).maybeSingle(),
+        supabaseAdmin.from("print_quotes").select("status, printer_id, designs(file_url)").eq("id", quoteId).maybeSingle(),
+      ]);
+      const canAssess = profile?.role === "printer" && quote &&
+        (quote.status === "open" || (quote.status === "offered" && quote.printer_id === userId));
+      if (canAssess) fileUrl = quote.designs?.file_url;
     } else {
       return res.status(400).json({ error: "طلب غير صالح" });
     }

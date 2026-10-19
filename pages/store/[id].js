@@ -5,6 +5,7 @@ import { supabase } from "../../lib/supabaseClient";
 import { addToCart } from "../../lib/cart";
 import { useLanguage } from "../../lib/LanguageContext";
 import { getT } from "../../lib/translations";
+import QuoteRequestForm from "../../components/QuoteRequestForm";
 
 export default function DesignDetail() {
   const router = useRouter();
@@ -15,6 +16,7 @@ export default function DesignDetail() {
   const [design, setDesign] = useState(null);
   const [loading, setLoading] = useState(true);
   const [added, setAdded] = useState(false);
+  const [activeImage, setActiveImage] = useState(0);
 
   useEffect(() => {
     if (!id) return;
@@ -38,6 +40,9 @@ export default function DesignDetail() {
   if (loading) return <p className="text-center">{t("detail_loading")}</p>;
   if (!design) return <p className="text-center">{t("detail_not_found")}</p>;
 
+  const isQuote = design.pricing_mode === "quote";
+  const images = (design.preview_image_urls?.length ? design.preview_image_urls : [design.preview_image_url]).filter(Boolean);
+
   return (
     <div className="max-w-2xl mx-auto">
       <Link
@@ -50,12 +55,12 @@ export default function DesignDetail() {
 
       <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
         <div className="aspect-square bg-[#EEF2F6]">
-          {design.preview_image_url ? (
+          {images.length > 0 ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
-              src={design.preview_image_url}
+              src={images[Math.min(activeImage, images.length - 1)]}
               alt={design.title}
-              className="h-full w-full object-cover"
+              className="h-full w-full object-contain"
             />
           ) : (
             <div className="h-full w-full flex items-center justify-center text-gray-300">
@@ -63,6 +68,23 @@ export default function DesignDetail() {
             </div>
           )}
         </div>
+        {images.length > 1 && (
+          <div className="flex gap-2 overflow-x-auto p-3 border-b" role="list">
+            {images.map((url, index) => (
+              <button
+                key={url}
+                type="button"
+                onClick={() => setActiveImage(index)}
+                aria-label={`${design.title} ${index + 1}`}
+                aria-current={index === activeImage}
+                className={`h-16 w-16 flex-shrink-0 rounded-lg overflow-hidden border-2 ${index === activeImage ? "border-teal" : "border-transparent"}`}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={url} alt="" loading="lazy" className="h-full w-full object-cover" />
+              </button>
+            ))}
+          </div>
+        )}
 
         <div className="p-6 md:p-8">
           <h1 className="text-2xl font-bold text-navy mb-2">{design.title}</h1>
@@ -77,6 +99,10 @@ export default function DesignDetail() {
 
           <p className="text-gray-600 mb-6">{design.description}</p>
 
+          {isQuote ? (
+            <QuoteRequestForm designId={design.id} lang={lang} />
+          ) : (
+            <>
           <div className="flex items-center justify-between mb-6">
             <span className="text-gray-500 text-sm">{t("detail_price_label")}</span>
             <span className="text-2xl font-bold text-teal">{design.price} {t("riyal")}</span>
@@ -109,6 +135,8 @@ export default function DesignDetail() {
                 </Link>
               </div>
             </div>
+          )}
+            </>
           )}
         </div>
       </div>

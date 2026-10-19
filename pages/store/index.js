@@ -269,7 +269,7 @@ export default function Store() {
                     </div>
                   )}
                   <span className="absolute top-2 left-2 bg-white/90 backdrop-blur text-navy text-xs font-bold px-2 py-1 rounded-lg shadow-sm">
-                    {d.price} {t("riyal")}
+                    {d.pricing_mode === "quote" ? (lang === "ar" ? "السعر حسب الطلب" : "Price on request") : `${d.price} ${t("riyal")}`}
                   </span>
                 </div>
                 <div className="p-3 md:p-4 flex flex-col flex-1">
@@ -279,6 +279,11 @@ export default function Store() {
                   <p className="text-[11px] md:text-xs text-gray-500 leading-relaxed mb-3">
                     {techParts.join(" · ")}
                   </p>
+                  {d.pricing_mode === "quote" ? (
+                    <span className="mt-auto w-full text-center text-xs md:text-sm font-bold py-2 rounded-lg bg-teal/10 text-teal">
+                      {lang === "ar" ? "اطلب سعر الطباعة" : "Request a quote"}
+                    </span>
+                  ) : (
                   <button
                     onClick={(e) => handleAdd(e, d)}
                     className={`mt-auto w-full text-xs md:text-sm font-bold py-2 rounded-lg transition-colors ${
@@ -289,6 +294,7 @@ export default function Store() {
                   >
                     {addedId === d.id ? t("store_added") : t("store_add_to_cart")}
                   </button>
+                  )}
                 </div>
               </Link>
             );
