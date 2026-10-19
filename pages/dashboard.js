@@ -60,7 +60,7 @@ export default function Dashboard() {
         // الطابع يشوف فقط الطلبات المدفوعة فعليًا (payment_status = paid)
         const { data } = await supabase
           .from("orders")
-          .select("*, designs(title)")
+          .select("*, designs(title, file_url)")
           .eq("payment_status", "paid")
           .or(`status.eq.pending,printer_id.eq.${user.id}`)
           .order("created_at", { ascending: false });
@@ -209,7 +209,18 @@ export default function Dashboard() {
               {o.tracking_number && (
                 <p className="text-sm text-teal font-bold mt-1">
                   {t("dash_tracking_number")}: {o.tracking_number}
+                  {o.shipping_carrier && ` (${o.shipping_carrier})`}
                 </p>
+              )}
+              {o.tracking_url && (
+                <a
+                  href={o.tracking_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block mt-2 text-sm bg-teal text-white px-4 py-1.5 rounded-lg"
+                >
+                  {t("dash_track_shipment")}
+                </a>
               )}
             </div>
           ))}
@@ -228,7 +239,25 @@ export default function Dashboard() {
                   {STATUS_LABELS[o.status]}
                 </span>
               </div>
-              <p className="text-sm text-gray-500 mb-1">{o.total_price} {t("riyal")}</p>
+              <p className="text-sm text-gray-500 mb-1">
+                {o.total_price} {t("riyal")}
+                {o.quantity > 1 && ` — ${t("dash_quantity")}: ${o.quantity}`}
+              </p>
+
+              {o.printer_id === user.id && (o.custom_file_url || o.designs?.file_url) && (
+                <a
+                  href={o.custom_file_url || o.designs.file_url}
+                  download
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block mb-3 text-sm bg-navy text-white px-4 py-1.5 rounded-lg"
+                >
+                  {t("dash_download_print_file")}
+                </a>
+              )}
+              {o.printer_id === user.id && o.notes && (
+                <p className="text-sm text-gray-600 mb-3">{t("dash_customer_notes")}: {o.notes}</p>
+              )}
 
               {o.printer_id === user.id && o.shipping_name && (
                 <div className="text-sm text-gray-600 bg-gray-50 rounded-lg p-3 mb-3">
@@ -256,8 +285,14 @@ export default function Dashboard() {
                 </button>
               )}
 
-              {o.printer_id === user.id && o.status === "printing" && (
+              {o.printer_id === user.id && o.status === "printing" && !o.oto_order_id && (
                 <OrderPickupForm orderId={o.id} lang={lang} />
+              )}
+              {o.printer_id === user.id && o.status === "printing" && o.oto_order_id && (
+                <p className="text-sm text-gray-600 bg-gray-50 rounded-lg p-3 my-3">
+                  {t("dash_oto_prepared")}: {o.oto_order_id}
+                  {o.shipping_status && ` — ${o.shipping_status}`}
+                </p>
               )}
 
               {o.printer_id === user.id && o.status === "printing" && (
