@@ -42,6 +42,7 @@ export default function Dashboard() {
   const [loadingData, setLoadingData] = useState(true);
   const [trackingInputs, setTrackingInputs] = useState({});
   const [deletingId, setDeletingId] = useState(null);
+  const [downloadingId, setDownloadingId] = useState(null);
 
   useEffect(() => {
     if (!user || !profile) return;
@@ -60,7 +61,7 @@ export default function Dashboard() {
         // الطابع يشوف فقط الطلبات المدفوعة فعليًا (payment_status = paid)
         const { data } = await supabase
           .from("orders")
-          .select("*, designs(title, file_url)")
+          .select("*, designs(title)")
           .eq("payment_status", "paid")
           .or(`status.eq.pending,printer_id.eq.${user.id}`)
           .order("created_at", { ascending: false });
@@ -135,6 +136,27 @@ export default function Dashboard() {
       return;
     }
     updateStatus(orderId, "shipped", { tracking_number: trackingNumber });
+  }
+
+  // الملفات خاصة؛ نطلب رابط تحميل مؤقت من السيرفر
+  async function downloadFile(target) {
+    const key = target.orderId || target.designId;
+    setDownloadingId(key);
+    try {
+      const { data } = await supabase.auth.getSession();
+      const response = await fetch("/api/files/download", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${data.session?.access_token || ""}` },
+        body: JSON.stringify(target),
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || !result.url) throw new Error(result.error);
+      window.location.href = result.url;
+    } catch (err) {
+      alert(err.message || (lang === "en" ? "Could not download the file." : "تعذر تحميل الملف"));
+    } finally {
+      setDownloadingId(null);
+    }
   }
 
   async function deleteDesign(designId) {
@@ -244,16 +266,14 @@ export default function Dashboard() {
                 {o.quantity > 1 && ` — ${t("dash_quantity")}: ${o.quantity}`}
               </p>
 
-              {o.printer_id === user.id && (o.custom_file_url || o.designs?.file_url) && (
-                <a
-                  href={o.custom_file_url || o.designs.file_url}
-                  download
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-block mb-3 text-sm bg-navy text-white px-4 py-1.5 rounded-lg"
+              {o.printer_id === user.id && (
+                <button
+                  onClick={() => downloadFile({ orderId: o.id })}
+                  disabled={downloadingId === o.id}
+                  className="inline-block mb-3 text-sm bg-navy text-white px-4 py-1.5 rounded-lg disabled:opacity-50"
                 >
-                  {t("dash_download_print_file")}
-                </a>
+                  {downloadingId === o.id ? t("dash_loading") : t("dash_download_print_file")}
+                </button>
               )}
               {o.printer_id === user.id && o.notes && (
                 <p className="text-sm text-gray-600 mb-3">{t("dash_customer_notes")}: {o.notes}</p>
@@ -337,15 +357,13 @@ export default function Dashboard() {
               </div>
               <div className="flex items-center gap-2 shrink-0">
               {d.file_url && (
-                <a
-                  href={d.file_url}
-                  download
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-navy text-white text-sm px-4 py-1.5 rounded-lg hover:opacity-90 whitespace-nowrap"
+                <button
+                  onClick={() => downloadFile({ designId: d.id })}
+                  disabled={downloadingId === d.id}
+                  className="bg-navy text-white text-sm px-4 py-1.5 rounded-lg hover:opacity-90 whitespace-nowrap disabled:opacity-50"
                 >
                   {t("dash_download_file")}
-                </a>
+                </button>
               )}
               <button
                 onClick={() => deleteDesign(d.id)}

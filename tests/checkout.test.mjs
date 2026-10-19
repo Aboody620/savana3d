@@ -62,3 +62,13 @@ test("custom orders only accept files uploaded to the customer's own folder", ()
   assert.throws(() => buildCustomOrder({ customerId: "cust", supabaseUrl: "https://abc.supabase.co",
     fileUrl: `${base}cust/1.stl`, price: 1, shipping }));
 });
+
+const pathSource = await readFile(new URL("../lib/storagePath.js", import.meta.url), "utf8");
+const { designsPathFromUrl } = await import(`data:text/javascript;base64,${Buffer.from(pathSource).toString("base64")}`);
+test("stored file links resolve to private storage paths", () => {
+  const base = "https://abc.supabase.co";
+  assert.equal(designsPathFromUrl(`${base}/storage/v1/object/public/designs/u1/file%20a.stl`, base), "u1/file a.stl");
+  assert.equal(designsPathFromUrl(`${base}/storage/v1/object/public/previews/u1/a.png`, base), null);
+  assert.equal(designsPathFromUrl("https://evil.example/storage/v1/object/public/designs/u1/a.stl", base), null);
+  assert.equal(designsPathFromUrl(`${base}/storage/v1/object/public/designs/../x`, base), null);
+});
