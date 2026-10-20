@@ -44,17 +44,18 @@ export default function DesignDetail() {
   const images = (design.preview_image_urls?.length ? design.preview_image_urls : [design.preview_image_url]).filter(Boolean);
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div className="max-w-5xl mx-auto">
       <Link
         href="/store"
-        className="inline-flex items-center gap-1 text-navy text-sm font-medium mb-4 hover:opacity-70"
+        className="inline-flex items-center gap-1 text-graphite dark:text-[#e7ebe6] text-sm font-medium mb-5 hover:text-gold"
       >
         <span>{dir === "rtl" ? "→" : "←"}</span>
         <span>{t("detail_back")}</span>
       </Link>
 
-      <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-        <div className="aspect-square bg-[#EEF2F6]">
+      <div className="grid gap-6 md:gap-10 md:grid-cols-[1.05fr_0.95fr] items-start">
+        <div className="rounded-3xl overflow-hidden border border-line dark:border-[#323b37] bg-[#e2e6df] dark:bg-[#232a27] md:sticky md:top-24">
+        <div className="aspect-square">
           {images.length > 0 ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
@@ -69,7 +70,7 @@ export default function DesignDetail() {
           )}
         </div>
         {images.length > 1 && (
-          <div className="flex gap-2 overflow-x-auto p-3 border-b" role="list">
+          <div className="flex gap-2 overflow-x-auto p-3 border-t border-line dark:border-[#323b37]" role="list">
             {images.map((url, index) => (
               <button
                 key={url}
@@ -86,32 +87,33 @@ export default function DesignDetail() {
           </div>
         )}
 
-        <div className="p-6 md:p-8">
-          <h1 className="text-2xl font-bold text-navy mb-2">{design.title}</h1>
+        </div>
+        <div className="md:pt-2">
+          <h1 className="font-display font-bold text-3xl sm:text-4xl text-graphite dark:text-[#e7ebe6] leading-tight mb-3">{design.title}</h1>
 
-          <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs md:text-sm text-gray-500 mb-4">
+          <div className="flex flex-wrap gap-2 text-sm text-[#4a5551] dark:text-gray-400 mb-5">
             {design.print_time_hours && (
-              <span>⏱️ {t("card_print_time")}: {design.print_time_hours} {t("card_hours")}</span>
+              <span className="rounded-full border border-line dark:border-[#323b37] px-3 py-1">{t("card_print_time")}: {design.print_time_hours} {t("card_hours")}</span>
             )}
-            {design.material && <span>🧵 {t("card_material")}: {design.material}</span>}
-            <span>🎨 {design.multi_color ? t("card_colors_multi") : t("card_colors_one")}</span>
+            {design.material && <span className="rounded-full border border-line dark:border-[#323b37] px-3 py-1">{design.material}</span>}
+            <span className="rounded-full border border-line dark:border-[#323b37] px-3 py-1">{design.multi_color ? t("card_colors_multi") : t("card_colors_one")}</span>
           </div>
 
-          <p className="text-gray-600 mb-6">{design.description}</p>
+          <p className="text-[#4a5551] dark:text-gray-400 mb-7 whitespace-pre-wrap max-w-[60ch]">{design.description}</p>
 
           {isQuote ? (
             <QuoteRequestForm designId={design.id} lang={lang} />
           ) : (
             <>
-          <div className="flex items-center justify-between mb-6">
+          <div className="flex items-baseline justify-between border-y border-line dark:border-[#323b37] py-4 mb-6">
             <span className="text-gray-500 text-sm">{t("detail_price_label")}</span>
-            <span className="text-2xl font-bold text-teal">{design.price} {t("riyal")}</span>
+            <span className="font-display text-3xl font-bold text-gold">{design.price} {t("riyal")}</span>
           </div>
 
           {!added ? (
             <button
               onClick={handleAddToCart}
-              className="w-full bg-navy text-white py-3 rounded-xl font-bold hover:opacity-90 transition"
+              className="w-full bg-gold text-white py-3.5 rounded-xl font-display font-semibold hover:bg-[#bf3e0b] transition-colors"
             >
               {t("store_add_to_cart")}
             </button>

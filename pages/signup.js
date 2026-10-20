@@ -119,7 +119,7 @@ export default function Signup() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-teal text-white py-2.5 rounded-lg font-bold hover:opacity-90 disabled:opacity-50"
+          className="w-full bg-gold text-white py-2.5 rounded-lg font-bold hover:opacity-90 disabled:opacity-50"
         >
           {loading ? t("signup_loading") : t("signup_submit")}
         </button>

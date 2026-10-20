@@ -6,20 +6,18 @@ export default function Document() {
       <Head>
         <link rel="icon" href="/logo.png" />
         <link rel="apple-touch-icon" href="/logo.png" />
-        <meta name="theme-color" content="#1F3864" />
+        <meta name="theme-color" content="#ECEEE9" />
         <script
           dangerouslySetInnerHTML={{
             __html: `
               (function () {
                 try {
                   var theme = localStorage.getItem('savana3d-theme');
-                  if (theme !== 'light' && theme !== 'dark') theme = 'dark';
+                  if (theme !== 'light' && theme !== 'dark') theme = 'light';
                   if (theme === 'dark') {
                     document.documentElement.classList.add('dark');
                   }
-                } catch (e) {
-                  document.documentElement.classList.add('dark');
-                }
+                } catch (e) {}
                 try {
                   var lang = localStorage.getItem('savana3d-lang');
                   if (lang !== 'en' && lang !== 'ar') lang = 'ar';
