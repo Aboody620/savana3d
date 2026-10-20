@@ -13,7 +13,7 @@ const STATUS = {
   accepted: { label: "طلب جديد", tone: "bg-gold text-white" },
   printing: { label: "عند الطابع", tone: "bg-[#f6d9c9] text-[#8a3208]" },
   shipped: { label: "تم الشحن", tone: "bg-teal/15 text-teal" },
-  completed: { label: "مكتمل", tone: "bg-[#e2e6df] text-[#4a5551]" },
+  completed: { label: "مكتمل", tone: "bg-[#ECECE8] text-[#55554F]" },
   cancelled: { label: "ملغي", tone: "bg-red-50 text-red-700" },
 };
 const CATEGORIES = [["decor", "ديكور"], ["home", "أدوات منزلية"], ["toys", "ألعاب وهدايا"], ["hobby", "هوايات"], ["edu", "تعليمي"]];
@@ -104,7 +104,7 @@ function Orders() {
 
   return (
     <section>
-      <div className="flex flex-wrap gap-6 mb-6 text-sm text-[#4a5551]">
+      <div className="flex flex-wrap gap-6 mb-6 text-sm text-[#55554F]">
         <p><span className="text-2xl font-bold text-graphite">{open.length}</span> طلب مفتوح</p>
         <p><span className="text-2xl font-bold text-graphite">{orders.length}</span> طلب مدفوع</p>
         <p><span className="text-2xl font-bold text-graphite">{sales.toFixed(0)}</span> ريال مبيعات</p>
@@ -116,31 +116,31 @@ function Orders() {
         </div>
       </div>
       {error && <p role="alert" className="text-red-600 mb-4">{error}</p>}
-      {shown.length === 0 && <p className="py-12 text-center text-[#5d6864]">ما فيه طلبات {filter === "open" ? "مفتوحة" : ""} حاليًا.</p>}
+      {shown.length === 0 && <p className="py-12 text-center text-[#6F6F6A]">ما فيه طلبات {filter === "open" ? "مفتوحة" : ""} حاليًا.</p>}
       <ul className="space-y-4">
         {shown.map((o) => {
-          const st = STATUS[o.status] || { label: o.status, tone: "bg-[#e2e6df]" };
+          const st = STATUS[o.status] || { label: o.status, tone: "bg-[#ECECE8]" };
           const local = /المدينة|المدينه|madinah|medina/i.test(o.shipping_city || "");
           return (
             <li key={o.id} className="rounded-2xl border border-line bg-white p-5">
               <div className="flex flex-wrap items-start gap-3 mb-3">
                 <div className="me-auto">
                   <p className="font-bold text-lg text-graphite">{o.designs?.title || "طلب طباعة"} × {o.quantity || 1}</p>
-                  <p className="text-sm text-[#5d6864]">
+                  <p className="text-sm text-[#6F6F6A]">
                     {[o.color, o.quality === "high" ? "جودة عالية" : "جودة عادية"].filter(Boolean).join(" · ")}
                     {" · "}{new Date(o.created_at).toLocaleDateString("ar-SA-u-ca-gregory", { day: "numeric", month: "short" })}
                   </p>
                 </div>
                 <span className={`rounded-full px-3 py-1 text-sm font-semibold ${st.tone}`}>{st.label}</span>
               </div>
-              <div className="grid sm:grid-cols-2 gap-x-6 gap-y-1 text-sm text-[#3d4744] mb-4">
-                <p><span className="text-[#7b8681]">الزبون: </span>{o.shipping_name}</p>
-                <p><span className="text-[#7b8681]">الجوال: </span><a dir="ltr" href={`tel:+${o.shipping_phone}`} className="text-gold">+{o.shipping_phone}</a></p>
-                <p className="sm:col-span-2"><span className="text-[#7b8681]">العنوان: </span>{o.shipping_city} — {o.shipping_address}</p>
-                <p><span className="text-[#7b8681]">المبلغ: </span>{o.total_price} + توصيل {o.shipping_cost} ريال</p>
-                <p><span className="text-[#7b8681]">التوصيل: </span>{local ? "أوصله بنفسي (داخل المدينة)" : "شحن عن طريق OTO"}</p>
-                {o.notes && <p className="sm:col-span-2"><span className="text-[#7b8681]">ملاحظات: </span>{o.notes}</p>}
-                {o.tracking_number && <p className="sm:col-span-2"><span className="text-[#7b8681]">رقم التتبع: </span>{o.tracking_number}</p>}
+              <div className="grid sm:grid-cols-2 gap-x-6 gap-y-1 text-sm text-[#3A3A36] mb-4">
+                <p><span className="text-[#8A8A84]">الزبون: </span>{o.shipping_name}</p>
+                <p><span className="text-[#8A8A84]">الجوال: </span><a dir="ltr" href={`tel:+${o.shipping_phone}`} className="text-gold">+{o.shipping_phone}</a></p>
+                <p className="sm:col-span-2"><span className="text-[#8A8A84]">العنوان: </span>{o.shipping_city} — {o.shipping_address}</p>
+                <p><span className="text-[#8A8A84]">المبلغ: </span>{o.total_price} + توصيل {o.shipping_cost} ريال</p>
+                <p><span className="text-[#8A8A84]">التوصيل: </span>{local ? "أوصله بنفسي (داخل المدينة)" : "شحن عن طريق OTO"}</p>
+                {o.notes && <p className="sm:col-span-2"><span className="text-[#8A8A84]">ملاحظات: </span>{o.notes}</p>}
+                {o.tracking_number && <p className="sm:col-span-2"><span className="text-[#8A8A84]">رقم التتبع: </span>{o.tracking_number}</p>}
               </div>
               <div className="flex flex-wrap items-center gap-2">
                 {(o.designs?.file_url || o.custom_file_url) && (
@@ -201,17 +201,17 @@ function Products({ userId }) {
     <section>
       <button onClick={() => setEditing("new")} className="mb-6 rounded-2xl bg-gold text-white px-6 py-3 font-bold">+ إضافة منتج</button>
       {error && <p role="alert" className="text-red-600 mb-4">{error}</p>}
-      {items.length === 0 && <p className="py-12 text-center text-[#5d6864]">ما فيه منتجات للحين. أضف أول منتج.</p>}
+      {items.length === 0 && <p className="py-12 text-center text-[#6F6F6A]">ما فيه منتجات للحين. أضف أول منتج.</p>}
       <ul className="grid gap-3">
         {items.map((d) => (
           <li key={d.id} className={`flex items-center gap-4 rounded-2xl border border-line bg-white p-3 ${d.is_active === false ? "opacity-60" : ""}`}>
-            <div className="h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-[#e2e6df]">
+            <div className="h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-[#ECECE8]">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               {d.preview_image_url && <img src={d.preview_image_url} alt="" className="h-full w-full object-cover" />}
             </div>
             <div className="min-w-0 me-auto">
               <p className="font-bold text-graphite truncate">{d.title}</p>
-              <p className="text-sm text-[#5d6864]">
+              <p className="text-sm text-[#6F6F6A]">
                 {d.price} ريال{d.price_high ? ` · عالية ${d.price_high}` : ""}
                 {d.colors?.length ? ` · ${d.colors.length} ألوان` : ""}
                 {d.is_active === false ? " · مخفي" : ""}
@@ -305,7 +305,7 @@ function ProductForm({ userId, design, onDone }) {
       </div>
       <label className="block font-medium">الألوان المتوفرة
         <input value={v.colors} onChange={set("colors")} className={field} placeholder="مثلًا: أسود، أبيض، رمادي" />
-        <span className="text-sm font-normal text-[#5d6864]">افصل بينها بفاصلة. اتركها فاضية لو المنتج بلون واحد.</span>
+        <span className="text-sm font-normal text-[#6F6F6A]">افصل بينها بفاصلة. اتركها فاضية لو المنتج بلون واحد.</span>
       </label>
       {colors.length > 0 && (
         <div className="flex flex-wrap gap-2">
@@ -323,11 +323,11 @@ function ProductForm({ userId, design, onDone }) {
       </label>
       <label className="block font-medium">{design ? "صور جديدة (تستبدل الحالية)" : "صور المنتج"}
         <input type="file" multiple accept="image/jpeg,image/png,image/webp" onChange={(e) => setImages(Array.from(e.target.files || []))} className="block mt-2 text-sm" />
-        <span className="text-sm font-normal text-[#5d6864]">أول صورة هي الرئيسية. صور حقيقية للقطعة المطبوعة تبيع أكثر.</span>
+        <span className="text-sm font-normal text-[#6F6F6A]">أول صورة هي الرئيسية. صور حقيقية للقطعة المطبوعة تبيع أكثر.</span>
       </label>
       <label className="block font-medium">ملف التصميم للطابع (STL / OBJ / 3MF){design?.file_url ? " — موجود، ارفع ملف جديد لو تبي تستبدله" : ""}
         <input type="file" accept=".stl,.obj,.3mf,.step,.stp" onChange={(e) => setFile(e.target.files?.[0] || null)} className="block mt-2 text-sm" />
-        <span className="text-sm font-normal text-[#5d6864]">خاص، ما يشوفه الزبون. تحمّله من الطلب وترسله للطابع.</span>
+        <span className="text-sm font-normal text-[#6F6F6A]">خاص، ما يشوفه الزبون. تحمّله من الطلب وترسله للطابع.</span>
       </label>
       {error && <p role="alert" className="text-red-600">{error}</p>}
       <div className="flex gap-3">

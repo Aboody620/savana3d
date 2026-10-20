@@ -58,11 +58,11 @@ export default function Login() {
   }
 
   return (
-    <div className="max-w-md mx-auto bg-white p-8 rounded-xl shadow-sm">
+    <div className="max-w-sm mx-auto pt-6">
       <Head>
         <meta name="robots" content="noindex,nofollow" />
       </Head>
-      <h1 className="text-2xl font-bold text-navy mb-6">{t("login_title")}</h1>
+      <h1 className="text-3xl font-semibold tracking-tightest text-ink mb-8">{t("login_title")}</h1>
 
       <form onSubmit={handleLogin} className="space-y-4">
         <div>
@@ -72,7 +72,7 @@ export default function Login() {
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full border rounded-lg px-3 py-2"
+            className="w-full rounded-xl border-0 bg-stone px-4 py-3"
           />
         </div>
 
@@ -83,7 +83,7 @@ export default function Login() {
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full border rounded-lg px-3 py-2"
+            className="w-full rounded-xl border-0 bg-stone px-4 py-3"
           />
         </div>
 
@@ -114,11 +114,14 @@ export default function Login() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-navy text-white py-2.5 rounded-lg font-bold hover:opacity-90 disabled:opacity-50"
+          className="w-full bg-ink text-white py-3.5 rounded-full font-semibold hover:opacity-85 disabled:opacity-50"
         >
           {loading ? t("login_loading") : t("login_submit")}
         </button>
       </form>
+      <p className="mt-6 text-center text-sm text-muted">
+        <a href="/signup" className="text-ink font-semibold underline underline-offset-4">{lang === "en" ? "No account? Create one" : "ما عندك حساب؟ أنشئ حساب"}</a>
+      </p>
     </div>
   );
 }

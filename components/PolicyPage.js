@@ -26,8 +26,8 @@ export default function PolicyPage({ path, title, intro, sections }) {
             aria-current={l.href === path ? "page" : undefined}
             className={`rounded-full px-4 py-2 text-sm font-semibold ${
               l.href === path
-                ? "bg-graphite text-white dark:bg-[#e7ebe6] dark:text-[#121715]"
-                : "text-graphite dark:text-[#e7ebe6] hover:bg-graphite/5"
+                ? "bg-graphite text-white dark:bg-[#F2F2EF] dark:text-[#0E0E0D]"
+                : "text-graphite dark:text-[#F2F2EF] hover:bg-graphite/5"
             }`}
           >
             {l.label}
@@ -35,17 +35,17 @@ export default function PolicyPage({ path, title, intro, sections }) {
         ))}
       </nav>
 
-      <h1 className="font-bold text-3xl sm:text-4xl text-graphite dark:text-[#e7ebe6] mb-3">{title}</h1>
-      <p className="text-sm text-[#7b8681] mb-6">آخر تحديث: {BUSINESS.updated}</p>
-      <p className="text-lg text-[#4a5551] dark:text-gray-300 mb-10 max-w-[65ch]">{intro}</p>
+      <h1 className="font-bold text-3xl sm:text-4xl text-graphite dark:text-[#F2F2EF] mb-3">{title}</h1>
+      <p className="text-sm text-[#8A8A84] mb-6">آخر تحديث: {BUSINESS.updated}</p>
+      <p className="text-lg text-[#55554F] dark:text-gray-300 mb-10 max-w-[65ch]">{intro}</p>
 
       <div className="space-y-9">
         {sections.map((s) => (
           <section key={s.title}>
-            <h2 className="font-bold text-xl text-graphite dark:text-[#e7ebe6] mb-3">{s.title}</h2>
-            {s.text && <p className="text-[#3d4744] dark:text-gray-300 max-w-[65ch] leading-8">{s.text}</p>}
+            <h2 className="font-bold text-xl text-graphite dark:text-[#F2F2EF] mb-3">{s.title}</h2>
+            {s.text && <p className="text-[#3A3A36] dark:text-gray-300 max-w-[65ch] leading-8">{s.text}</p>}
             {s.items && (
-              <ul className="list-disc ps-6 space-y-2 text-[#3d4744] dark:text-gray-300 max-w-[65ch] leading-8">
+              <ul className="list-disc ps-6 space-y-2 text-[#3A3A36] dark:text-gray-300 max-w-[65ch] leading-8">
                 {s.items.map((item) => <li key={item}>{item}</li>)}
               </ul>
             )}
@@ -53,9 +53,9 @@ export default function PolicyPage({ path, title, intro, sections }) {
         ))}
       </div>
 
-      <section className="mt-12 rounded-2xl border border-line dark:border-[#323b37] p-6">
-        <h2 className="font-bold text-lg text-graphite dark:text-[#e7ebe6] mb-3">بيانات المتجر والتواصل</h2>
-        <dl className="grid sm:grid-cols-[auto_1fr] gap-x-6 gap-y-2 text-[#3d4744] dark:text-gray-300">
+      <section className="mt-12 rounded-2xl border border-line dark:border-[#2E2E2B] p-6">
+        <h2 className="font-bold text-lg text-graphite dark:text-[#F2F2EF] mb-3">بيانات المتجر والتواصل</h2>
+        <dl className="grid sm:grid-cols-[auto_1fr] gap-x-6 gap-y-2 text-[#3A3A36] dark:text-gray-300">
           <dt className="font-semibold">اسم المتجر</dt><dd>{BUSINESS.name} ({BUSINESS.nameAr})</dd>
           <dt className="font-semibold">وثيقة العمل الحر</dt><dd dir="ltr" className="text-right">{BUSINESS.freelanceDocument}</dd>
           <dt className="font-semibold">توثيق المركز السعودي للأعمال</dt><dd dir="ltr" className="text-right">{BUSINESS.businessCenterAuth}</dd>

@@ -1,35 +1,27 @@
 /** @type {import('tailwindcss').Config} */
-// ألوان Savana3D مستوحاة من الطباعة نفسها: سطح الطابعة، الغرافيت، وبرتقالي الفيلامنت.
-// الأسماء القديمة (navy / teal / gold) باقية عشان كل الصفحات تاخذ الهوية الجديدة تلقائيًا.
+// هوية Savana3D: أبيض وأسود هادئ، والمنتجات وصورها هي اللي تتكلم.
+// الأسماء القديمة (navy / teal / gold / graphite) باقية عشان كل الصفحات تاخذ الهوية تلقائيًا.
 module.exports = {
   darkMode: "class",
   content: ["./pages/**/*.{js,jsx}", "./components/**/*.{js,jsx}"],
   theme: {
     extend: {
       colors: {
-        navy: "#1C2422",      // غرافيت — النص والأزرار الأساسية
-        teal: "#0E6B5F",      // أخضر الشعار — روابط ونجاح
-        gold: "#D9480F",      // برتقالي الفيلامنت — الإجراء الأهم بكل صفحة
-        bed: "#ECEEE9",       // سطح الطابعة — خلفية الصفحات
-        line: "#D3D8D0",      // خطوط فاصلة هادئة
-        filament: "#D9480F",
-        graphite: "#1C2422",
+        ink: "#141414",       // النص والأزرار
+        navy: "#141414",
+        graphite: "#141414",
+        gold: "#141414",      // الإجراء الأهم = أسود
+        teal: "#2F6B5E",      // نجاح وحالات
+        bed: "#F7F7F5",       // خلفية الصفحات
+        stone: "#ECECE8",     // خلفية صور المنتجات
+        line: "#E3E3DE",
+        muted: "#6F6F6A",
       },
       fontFamily: {
-        // نفس خط الموقع الأصلي: خط النظام (Segoe UI على ويندوز، والخط الافتراضي بالجوال)
         display: ["Segoe UI", "system-ui", "-apple-system", "Tahoma", "Arial", "sans-serif"],
         sans: ["Segoe UI", "system-ui", "-apple-system", "Tahoma", "Arial", "sans-serif"],
       },
-      keyframes: {
-        layerIn: {
-          "0%": { transform: "scaleX(0)" },
-          "100%": { transform: "scaleX(1)" },
-        },
-        nozzleRun: {
-          "0%, 100%": { transform: "translateX(-38px)" },
-          "50%": { transform: "translateX(38px)" },
-        },
-      },
+      letterSpacing: { tightest: "-0.03em" },
     },
   },
   plugins: [],

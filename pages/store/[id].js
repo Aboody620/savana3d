@@ -63,8 +63,8 @@ export default function DesignDetail() {
   const option = (active) =>
     `rounded-full border px-4 py-2 text-sm font-semibold transition-colors ${
       active
-        ? "border-graphite bg-graphite text-white dark:bg-[#e7ebe6] dark:text-[#121715]"
-        : "border-line dark:border-[#323b37] text-graphite dark:text-[#e7ebe6] hover:border-graphite"
+        ? "border-graphite bg-graphite text-white dark:bg-[#F2F2EF] dark:text-[#0E0E0D]"
+        : "border-line dark:border-[#2E2E2B] text-graphite dark:text-[#F2F2EF] hover:border-graphite"
     }`;
 
   return (
@@ -73,19 +73,19 @@ export default function DesignDetail() {
         <title>{`${design.title} | Savana3D`}</title>
         {design.description && <meta name="description" content={design.description.slice(0, 160)} />}
       </Head>
-      <Link href="/store" className="inline-flex items-center gap-1 text-sm font-medium text-[#5d6864] dark:text-gray-400 mb-4 hover:text-gold">
+      <Link href="/store" className="inline-flex items-center gap-1 text-sm font-medium text-[#6F6F6A] dark:text-gray-400 mb-4 hover:text-gold">
         <span aria-hidden="true">{dir === "rtl" ? "→" : "←"}</span>
         <span>{ar ? "المتجر" : "Store"}</span>
       </Link>
 
       <div className="grid gap-6 md:gap-12 md:grid-cols-2 items-start">
         <div className="md:sticky md:top-24">
-          <div className="aspect-square rounded-3xl overflow-hidden bg-[#e2e6df] dark:bg-[#232a27]">
+          <div className="aspect-[4/5] rounded-[28px] overflow-hidden bg-stone dark:bg-[#222220]">
             {images.length > 0 ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={images[Math.min(activeImage, images.length - 1)]} alt={design.title} className="h-full w-full object-contain" />
+              <img src={images[Math.min(activeImage, images.length - 1)]} alt={design.title} className="h-full w-full object-cover" />
             ) : (
-              <div className="h-full w-full flex items-center justify-center text-[#7b8681]">{t("store_no_preview")}</div>
+              <div className="h-full w-full flex items-center justify-center text-[#8A8A84]">{t("store_no_preview")}</div>
             )}
           </div>
           {images.length > 1 && (
@@ -103,16 +103,16 @@ export default function DesignDetail() {
         </div>
 
         <div className="md:pt-4">
-          <h1 className="font-bold text-3xl sm:text-4xl text-graphite dark:text-[#e7ebe6] leading-tight">{design.title}</h1>
-          <p className="mt-3 text-3xl font-bold text-gold">{price} {t("riyal")}</p>
+          <h1 className="font-semibold tracking-tightest text-3xl sm:text-[2.6rem] text-ink dark:text-[#F2F2EF] leading-tight">{design.title}</h1>
+          <p className="mt-3 text-2xl text-ink dark:text-[#F2F2EF]">{price} {ar ? "ر.س" : "SAR"}</p>
           {design.description && (
-            <p className="mt-5 text-[#4a5551] dark:text-gray-400 whitespace-pre-wrap max-w-[60ch]">{design.description}</p>
+            <p className="mt-5 text-[#55554F] dark:text-gray-400 whitespace-pre-wrap max-w-[60ch]">{design.description}</p>
           )}
 
           {colors.length > 0 && (
             <fieldset className="mt-7">
-              <legend className="font-semibold text-graphite dark:text-[#e7ebe6] mb-3">
-                {ar ? "اللون" : "Color"}{color && <span className="font-normal text-[#5d6864]">: {color}</span>}
+              <legend className="font-semibold text-graphite dark:text-[#F2F2EF] mb-3">
+                {ar ? "اللون" : "Color"}{color && <span className="font-normal text-[#6F6F6A]">: {color}</span>}
               </legend>
               <div className="flex flex-wrap gap-2">
                 {colors.map((c) => (
@@ -128,13 +128,13 @@ export default function DesignDetail() {
 
           {hasHigh && (
             <fieldset className="mt-6">
-              <legend className="font-semibold text-graphite dark:text-[#e7ebe6] mb-3">{ar ? "الجودة" : "Quality"}</legend>
+              <legend className="font-semibold text-graphite dark:text-[#F2F2EF] mb-3">{ar ? "الجودة" : "Quality"}</legend>
               <div className="flex flex-wrap gap-2">
                 <button type="button" aria-pressed={quality === "standard"} onClick={() => { setQuality("standard"); setAdded(false); }} className={option(quality === "standard")}>
-                  {ar ? "عادية" : "Standard"} · {design.price} {t("riyal")}
+                  {ar ? "عادية" : "Standard"} · {design.price}
                 </button>
                 <button type="button" aria-pressed={quality === "high"} onClick={() => { setQuality("high"); setAdded(false); }} className={option(quality === "high")}>
-                  {ar ? "عالية (تفاصيل أنعم)" : "High (finer detail)"} · {design.price_high} {t("riyal")}
+                  {ar ? "عالية" : "High"} · {design.price_high}
                 </button>
               </div>
             </fieldset>
@@ -143,21 +143,19 @@ export default function DesignDetail() {
           <div className="mt-8">
             {error && <p role="alert" className="text-red-600 text-sm mb-3">{error}</p>}
             {added ? (
-              <Link href="/cart" className="block w-full text-center bg-graphite text-white py-4 rounded-2xl font-bold hover:opacity-90">
+              <Link href="/cart" className="block w-full text-center bg-graphite text-white py-4 rounded-full font-semibold hover:opacity-90">
                 {ar ? "انضاف للسلة · روح للسلة" : "Added · Go to cart"}
               </Link>
             ) : (
-              <button onClick={handleAddToCart} className="w-full bg-gold text-white py-4 rounded-2xl font-bold hover:bg-[#bf3e0b] transition-colors">
+              <button onClick={handleAddToCart} className="w-full bg-gold text-white py-4 rounded-full font-semibold hover:opacity-85 transition-colors">
                 {t("store_add_to_cart")}
               </button>
             )}
           </div>
 
-          <ul className="mt-6 space-y-1.5 text-sm text-[#5d6864] dark:text-gray-400">
-            <li>{ar ? `يُطبع خصيصًا لك ويُجهَّز خلال ${lead}–${lead + 2} أيام عمل` : `Printed for you and ready in ${lead}–${lead + 2} business days`}</li>
-            <li>{ar ? `التوصيل داخل المدينة المنورة ${LOCAL_SHIPPING_COST} ريال، وباقي المملكة ${SHIPPING_COST} ريال` : `Delivery: ${LOCAL_SHIPPING_COST} SAR in Madinah, ${SHIPPING_COST} SAR elsewhere in Saudi Arabia`}</li>
-            <li>{ar ? "الدفع بمدى أو فيزا أو ماستركارد" : "Pay with mada, Visa or Mastercard"}</li>
-          </ul>
+          <p className="mt-5 text-sm text-muted">
+            {ar ? `يُجهَّز خلال ${lead}–${lead + 2} أيام · توصيل ${LOCAL_SHIPPING_COST} ر.س داخل المدينة، ${SHIPPING_COST} ر.س لباقي المملكة` : `Ready in ${lead}–${lead + 2} days · Delivery ${LOCAL_SHIPPING_COST} SAR in Madinah, ${SHIPPING_COST} SAR elsewhere`}
+          </p>
         </div>
       </div>
     </div>

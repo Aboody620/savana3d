@@ -45,11 +45,11 @@ export default function Signup() {
   }
 
   return (
-    <div className="max-w-md mx-auto bg-white p-8 rounded-xl shadow-sm">
+    <div className="max-w-sm mx-auto pt-6">
       <Head>
         <meta name="robots" content="noindex,nofollow" />
       </Head>
-      <h1 className="text-2xl font-bold text-navy mb-6">{t("signup_title")}</h1>
+      <h1 className="text-3xl font-semibold tracking-tightest text-ink mb-8">{t("signup_title")}</h1>
 
       <form onSubmit={handleSignup} className="space-y-4">
         <div>
@@ -59,7 +59,7 @@ export default function Signup() {
             required
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
-            className="w-full border rounded-lg px-3 py-2"
+            className="w-full rounded-xl border-0 bg-stone px-4 py-3"
           />
         </div>
 
@@ -70,7 +70,7 @@ export default function Signup() {
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full border rounded-lg px-3 py-2"
+            className="w-full rounded-xl border-0 bg-stone px-4 py-3"
           />
         </div>
 
@@ -82,7 +82,7 @@ export default function Signup() {
             minLength={6}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full border rounded-lg px-3 py-2"
+            className="w-full rounded-xl border-0 bg-stone px-4 py-3"
           />
         </div>
 
@@ -92,11 +92,14 @@ export default function Signup() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-gold text-white py-2.5 rounded-lg font-bold hover:opacity-90 disabled:opacity-50"
+          className="w-full bg-ink text-white py-3.5 rounded-full font-semibold hover:opacity-85 disabled:opacity-50"
         >
           {loading ? t("signup_loading") : t("signup_submit")}
         </button>
       </form>
+      <p className="mt-6 text-center text-sm text-muted">
+        <a href="/login" className="text-ink font-semibold underline underline-offset-4">{lang === "en" ? "Have an account? Log in" : "عندك حساب؟ سجّل دخول"}</a>
+      </p>
     </div>
   );
 }

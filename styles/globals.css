@@ -9,8 +9,8 @@ html {
 
 body {
   font-family: "Segoe UI", system-ui, -apple-system, Tahoma, Arial, sans-serif;
-  background-color: #ecEEE9;
-  color: #1c2422;
+  background-color: #F7F7F5;
+  color: #141414;
   line-height: 1.7;
   text-rendering: optimizeLegibility;
   transition: background-color 0.2s ease, color 0.2s ease;
@@ -22,13 +22,13 @@ h1, h2, h3, h4 {
 
 /* تركيز واضح للوحة المفاتيح بكل الموقع */
 :focus-visible {
-  outline: 3px solid #d9480f;
+  outline: 2px solid #141414;
   outline-offset: 2px;
   border-radius: 6px;
 }
 
 ::selection {
-  background: #d9480f;
+  background: #141414;
   color: #fff;
 }
 
@@ -37,18 +37,18 @@ h1, h2, h3, h4 {
 .bg-white.rounded-2xl,
 .bg-white.rounded-xl {
   box-shadow: none !important;
-  border: 1px solid #d3d8d0;
+  border: 1px solid #E3E3DE;
 }
 
 input, textarea, select {
-  border-color: #c9cfc6;
+  border-color: #DADAD4;
   background-color: #fff;
 }
 
 input:focus, textarea:focus, select:focus {
   outline: none;
-  border-color: #d9480f;
-  box-shadow: 0 0 0 3px rgba(217, 72, 15, 0.15);
+  border-color: #141414;
+  box-shadow: 0 0 0 3px rgba(20, 20, 20, 0.08);
 }
 
 /* الأزرار الأساسية تاخذ خط العناوين */
@@ -67,25 +67,25 @@ button.bg-navy, a.bg-navy, button.bg-teal, a.bg-teal, button.bg-gold, a.bg-gold 
    text-gray-*, border, إلخ) لما تنفعل .dark على <html>
    ============================================================ */
 .dark body {
-  background-color: #121715;
+  background-color: #0E0E0D;
   color: #e5e7eb;
 }
 
 .dark .bg-white {
-  background-color: #1a201e !important;
+  background-color: #191918 !important;
 }
 
 .dark .bg-gray-50 {
-  background-color: #121715 !important;
+  background-color: #0E0E0D !important;
 }
 
 .dark .bg-gray-100,
 .dark .bg-gray-200 {
-  background-color: #232a27 !important;
+  background-color: #222220 !important;
 }
 
 .dark .text-navy {
-  color: #e7ebe6 !important;
+  color: #F2F2EF !important;
 }
 
 .dark .text-gray-900,
@@ -102,15 +102,15 @@ button.bg-navy, a.bg-navy, button.bg-teal, a.bg-teal, button.bg-gold, a.bg-gold 
 .dark .border,
 .dark .border-gray-200,
 .dark .border-gray-300 {
-  border-color: #323b37 !important;
+  border-color: #2E2E2B !important;
 }
 
 .dark input,
 .dark textarea,
 .dark select {
-  background-color: #232a27 !important;
+  background-color: #222220 !important;
   color: #e5e7eb !important;
-  border-color: #323b37 !important;
+  border-color: #2E2E2B !important;
 }
 
 .dark input::placeholder,
@@ -126,9 +126,14 @@ button.bg-navy, a.bg-navy, button.bg-teal, a.bg-teal, button.bg-gold, a.bg-gold 
 .dark .bg-white.shadow-sm,
 .dark .bg-white.rounded-2xl,
 .dark .bg-white.rounded-xl {
-  border-color: #323b37;
+  border-color: #2E2E2B;
 }
-.dark .bg-bed { background-color: #121715 !important; }
+.dark .bg-bed { background-color: #0E0E0D !important; }
 .dark .text-teal { color: #4cc2ad !important; }
-.dark .bg-navy { background-color: #e7ebe6 !important; color: #121715 !important; }
-.dark .border-line { border-color: #323b37 !important; }
+.dark .bg-navy { background-color: #F2F2EF !important; color: #0E0E0D !important; }
+.dark .border-line { border-color: #2E2E2B !important; }
+
+/* الوضع الداكن: الأزرار والأسعار السوداء تنقلب فاتحة */
+.dark .bg-gold, .dark .bg-graphite, .dark .bg-ink { background-color: #F2F2EF !important; color: #0E0E0D !important; }
+.dark .text-gold, .dark .text-graphite, .dark .text-ink { color: #F2F2EF !important; }
+.dark .border-gold, .dark .border-graphite { border-color: #F2F2EF !important; }
