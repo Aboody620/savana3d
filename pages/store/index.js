@@ -21,11 +21,12 @@ export default function Store() {
   useEffect(() => {
     supabase
       .from("designs")
-      .select("id, title, price, pricing_mode, preview_image_url, category, created_at")
+      .select("*")
       .order("created_at", { ascending: false })
       .then(({ data, error }) => {
         if (error) setFailed(true);
-        else setDesigns(data || []);
+        // المنتجات المخفية أو القديمة بدون سعر ثابت ما تنعرض
+        else setDesigns((data || []).filter((d) => d.is_active !== false && d.pricing_mode !== "quote" && Number(d.price) > 0));
         setLoading(false);
       });
   }, []);
@@ -157,7 +158,7 @@ export default function Store() {
                   {d.title}
                 </h2>
                 <p className="mt-1 text-[0.95rem] font-bold text-gold">
-                  {d.pricing_mode === "quote" ? (ar ? "اطلب سعر" : "Get a quote") : `${d.price} ${t("riyal")}`}
+                  {d.price_high ? (ar ? "من " : "From ") : ""}{d.price} {t("riyal")}
                 </p>
               </Link>
             </li>

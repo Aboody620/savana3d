@@ -20,7 +20,18 @@ export default async function handler(req, res) {
     const { orderId, designId, quoteId } = req.body || {};
 
     let fileUrl = null;
-    if (typeof designId === "string" && UUID.test(designId)) {
+    const { data: adminRow } = await supabaseAdmin.from("admins").select("user_id").eq("user_id", userId).maybeSingle();
+    const isAdmin = Boolean(adminRow);
+
+    if (isAdmin && typeof orderId === "string" && UUID.test(orderId)) {
+      // صاحب المتجر يحمّل ملف أي طلب عشان يرسله للطابع
+      const { data: order } = await supabaseAdmin
+        .from("orders").select("custom_file_url, designs(file_url)").eq("id", orderId).maybeSingle();
+      fileUrl = order?.custom_file_url || order?.designs?.file_url || null;
+    } else if (isAdmin && typeof designId === "string" && UUID.test(designId)) {
+      const { data: design } = await supabaseAdmin.from("designs").select("file_url").eq("id", designId).maybeSingle();
+      fileUrl = design?.file_url || null;
+    } else if (typeof designId === "string" && UUID.test(designId)) {
       const { data: design } = await supabaseAdmin
         .from("designs").select("designer_id, file_url").eq("id", designId).maybeSingle();
       if (design && design.designer_id === userId) fileUrl = design.file_url;

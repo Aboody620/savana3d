@@ -5,6 +5,7 @@
 2. `supabase/migration_oto_tracking.sql` — tracking columns written by the OTO webhook.
 3. `supabase/migration_private_design_files.sql` — makes the `designs` bucket private and lets customers upload custom-order files.
 4. `supabase/migration_print_quotes.sql` — print quote requests/offers, design image gallery, `pricing_mode` on designs.
+5. `supabase/migration_single_seller.sql` — single-seller store: `admins` table (store owner), product colors / high-quality price / visibility, order color + quality, admin-only product and order management. Its last query must return the owner's email.
 
 Then run the check query at the end of file 1 to find any order marked paid without a Moyasar reference.
 

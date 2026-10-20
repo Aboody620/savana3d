@@ -33,7 +33,6 @@ function AppShell({ Component, pageProps }) {
             <h4 className="font-display font-semibold text-sm text-white mb-3">{t("footer_quick_links")}</h4>
             <ul className="space-y-2 text-sm">
               <li><a href="/store" className="hover:text-white">{t("nav_store")}</a></li>
-              <li><a href="/custom-order" className="hover:text-white">{t("nav_custom_order")}</a></li>
               <li><a href="/signup" className="hover:text-white">{t("nav_signup")}</a></li>
               <li><a href="/login" className="hover:text-white">{t("nav_login")}</a></li>
               <li><a href="/terms" className="hover:text-white">الشروط والأحكام</a></li>

@@ -16,15 +16,10 @@ export default function Navbar() {
   const t = getT(lang);
   const [cartCount, setCartCount] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [switchingRole, setSwitchingRole] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const menuRef = useRef(null);
 
-  const ROLE_LABELS = {
-    customer: t("role_customer"),
-    designer: t("role_designer"),
-    printer: t("role_printer"),
-  };
 
   useEffect(() => {
     function onScroll() {
@@ -54,44 +49,15 @@ export default function Navbar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  useEffect(() => {
+    if (!user) { setIsAdmin(false); return; }
+    supabase.rpc("is_admin").then(({ data }) => setIsAdmin(Boolean(data)));
+  }, [user]);
+
   async function handleLogout() {
     await supabase.auth.signOut();
     router.push("/");
   }
-
-  async function switchRole(newRole) {
-    if (!user || switchingRole) return;
-    setSwitchingRole(true);
-    const { error } = await supabase
-      .from("profiles")
-      .update({ role: newRole })
-      .eq("id", user.id);
-    setSwitchingRole(false);
-    if (!error) {
-      window.location.reload();
-    }
-  }
-
-  const roleOptions = (() => {
-    if (!profile) return [];
-    if (profile.role === "customer") {
-      return [
-        { role: "designer", label: t("nav_register_designer") },
-        { role: "printer", label: t("nav_register_printer") },
-      ];
-    }
-    if (profile.role === "designer") {
-      return [
-        { role: "customer", label: t("nav_switch_customer") },
-        { role: "printer", label: t("nav_switch_printer") },
-      ];
-    }
-    // printer
-    return [
-      { role: "customer", label: t("nav_switch_customer") },
-      { role: "designer", label: t("nav_switch_designer") },
-    ];
-  })();
 
   return (
     <nav
@@ -114,21 +80,15 @@ export default function Navbar() {
             {t("nav_store")}
           </Link>
 
-          {user && profile?.role === "designer" && (
-            <Link href="/upload" className="hover:text-gold whitespace-nowrap flex-shrink-0 py-1">
-              {t("nav_upload")}
+          {isAdmin && (
+            <Link href="/admin" className="hover:text-gold whitespace-nowrap flex-shrink-0 py-1">
+              {lang === "en" ? "Store admin" : "لوحة المتجر"}
             </Link>
           )}
 
-          {user && profile?.role === "customer" && (
-            <Link href="/custom-order" className="hover:text-gold whitespace-nowrap flex-shrink-0 py-1">
-              {t("nav_custom_order")}
-            </Link>
-          )}
-
-          {user && ["customer", "printer"].includes(profile?.role) && (
-            <Link href="/quotes" className="hover:text-gold whitespace-nowrap flex-shrink-0 py-1">
-              {lang === "en" ? "Quotes" : "عروض الطباعة"}
+          {user && (
+            <Link href="/dashboard" className="hover:text-gold whitespace-nowrap flex-shrink-0 py-1">
+              {lang === "en" ? "My orders" : "طلباتي"}
             </Link>
           )}
 
@@ -180,9 +140,7 @@ export default function Navbar() {
                   {profile && (
                     <div className="px-4 py-3 border-b border-gray-100 dark:border-slate-700">
                       <p className="font-bold text-sm truncate">{profile.full_name}</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
-                        {ROLE_LABELS[profile.role] || profile.role}
-                      </p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{user.email}</p>
                     </div>
                   )}
 
@@ -247,28 +205,6 @@ export default function Navbar() {
                       </button>
                     </div>
                   </div>
-
-                  {/* تبديل نوع الحساب */}
-                  {roleOptions.length > 0 && (
-                    <div className="px-4 py-3 border-b border-gray-100 dark:border-slate-700">
-                      <p className="text-xs font-bold text-gray-500 dark:text-gray-400 mb-2">
-                        {t("nav_account_type")}
-                      </p>
-                      <div className="space-y-1">
-                        {roleOptions.map((opt) => (
-                          <button
-                            key={opt.role}
-                            type="button"
-                            onClick={() => switchRole(opt.role)}
-                            disabled={switchingRole}
-                            className="w-full text-right text-sm py-1.5 px-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 disabled:opacity-50 transition-colors"
-                          >
-                            {switchingRole ? t("nav_switching") : opt.label}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
 
                   {/* الدعم */}
                   <a
