@@ -9,7 +9,7 @@ import { getCart, removeFromCart, updateQuantity, getCartSubtotal } from "../lib
 import { useLanguage } from "../lib/LanguageContext";
 import { getT } from "../lib/translations";
 import { getPublishableKey, paymentKeyIsConfigured, paymentUnavailableMessage } from "../lib/paymentConfig";
-import { SHIPPING_COST } from "../lib/checkout";
+import { SHIPPING_COST, LOCAL_SHIPPING_COST, LOCAL_CITY, shippingFor } from "../lib/checkout";
 
 export default function Cart() {
   const router = useRouter();
@@ -56,7 +56,8 @@ export default function Cart() {
   }, [activeCheckout, moyasarReady]);
 
   const subtotal = getCartSubtotal();
-  const total = items.length > 0 ? subtotal + SHIPPING_COST : 0;
+  const shippingCost = shippingFor(shipping.city);
+  const total = items.length > 0 ? subtotal + shippingCost : 0;
 
   function handleCheckoutClick() {
     if (!user) {
@@ -69,6 +70,10 @@ export default function Cart() {
   async function handleCreateOrders(e) {
     e.preventDefault();
     setError("");
+    if (!shipping.city.trim()) {
+      setError(lang === "en" ? "Choose your city" : "اختر مدينتك");
+      return;
+    }
     if (!paymentKeyIsConfigured(getPublishableKey()) || !moyasarReady) {
       setError(paymentUnavailableMessage(lang));
       return;
@@ -90,15 +95,15 @@ export default function Cart() {
         },
         body: JSON.stringify({
           type: "store",
-          items: items.map((i) => ({ id: i.id, quantity: i.quantity })),
-          shipping,
+          items: items.map((i) => ({ id: i.id, quantity: i.quantity, color: i.color, quality: i.quality })),
+          shipping: { ...shipping, city: shipping.city.trim() },
         }),
       });
       const result = await response.json().catch(() => ({}));
 
       if (response.status === 409 && Array.isArray(result.missing) && result.missing.length) {
         // منتج انحذف بعد ما انضاف للسلة
-        result.missing.forEach((id) => removeFromCart(id));
+        items.filter((i) => result.missing.includes(i.id)).forEach((i) => removeFromCart(i.key));
         setError(t("cart_items_removed_error"));
         return;
       }
@@ -140,7 +145,7 @@ export default function Cart() {
         {!activeCheckout && (
           <div className="bg-white rounded-2xl shadow-sm divide-y mb-6">
             {items.map((item) => (
-              <div key={item.id} className="flex items-center gap-4 p-4">
+              <div key={item.key} className="flex items-center gap-4 p-4">
                 <div className="h-16 w-16 rounded-lg bg-[#EEF2F6] overflow-hidden flex-shrink-0">
                   {item.preview_image_url && (
                     // eslint-disable-next-line @next/next/no-img-element
@@ -149,25 +154,30 @@ export default function Cart() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="font-bold text-navy text-sm truncate">{item.title}</p>
+                  {(item.color || item.quality === "high") && (
+                    <p className="text-xs text-gray-500">
+                      {[item.color, item.quality === "high" ? (lang === "en" ? "High quality" : "جودة عالية") : null].filter(Boolean).join(" · ")}
+                    </p>
+                  )}
                   <p className="text-teal font-bold text-sm">{item.price} {t("riyal")}</p>
                 </div>
                 <div className="flex items-center gap-2">
                   <button
-                    onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                    onClick={() => updateQuantity(item.key, item.quantity - 1)}
                     className="w-7 h-7 rounded-full bg-gray-100 text-navy font-bold"
                   >
                     −
                   </button>
                   <span className="w-5 text-center text-sm">{item.quantity}</span>
                   <button
-                    onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                    onClick={() => updateQuantity(item.key, item.quantity + 1)}
                     className="w-7 h-7 rounded-full bg-gray-100 text-navy font-bold"
                   >
                     +
                   </button>
                 </div>
                 <button
-                  onClick={() => removeFromCart(item.id)}
+                  onClick={() => removeFromCart(item.key)}
                   className="text-red-500 text-xs font-medium mr-2"
                 >
                   {t("cart_remove")}
@@ -185,7 +195,9 @@ export default function Cart() {
             </div>
             <div className="flex justify-between">
               <span>{t("cart_shipping")}</span>
-              <span>{SHIPPING_COST} {t("riyal")}</span>
+              <span>
+                {shipping.city ? `${shippingCost} ${t("riyal")}` : `${LOCAL_SHIPPING_COST}–${SHIPPING_COST} ${t("riyal")}`}
+              </span>
             </div>
             <div className="flex justify-between font-bold text-navy border-t pt-2 mt-2 text-base">
               <span>{t("cart_total")}</span>
@@ -232,13 +244,35 @@ export default function Cart() {
 
             <div>
               <label className="block text-sm font-medium mb-1">{t("cart_city")}</label>
-              <input
-                type="text"
-                required
-                value={shipping.city}
-                onChange={(e) => setShipping({ ...shipping, city: e.target.value })}
-                className="w-full border rounded-lg px-3 py-2"
-              />
+              <div className="grid grid-cols-2 gap-2 mb-2">
+                <button
+                  type="button"
+                  onClick={() => setShipping({ ...shipping, city: LOCAL_CITY })}
+                  aria-pressed={shipping.city === LOCAL_CITY}
+                  className={`rounded-lg border py-2 text-sm font-semibold ${shipping.city === LOCAL_CITY ? "bg-graphite text-white border-graphite" : ""}`}
+                >
+                  {lang === "en" ? "Madinah" : "المدينة المنورة"} · {LOCAL_SHIPPING_COST} {t("riyal")}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShipping({ ...shipping, city: shipping.city === LOCAL_CITY ? "" : shipping.city || " " })}
+                  aria-pressed={shipping.city !== "" && shipping.city !== LOCAL_CITY}
+                  className={`rounded-lg border py-2 text-sm font-semibold ${shipping.city !== "" && shipping.city !== LOCAL_CITY ? "bg-graphite text-white border-graphite" : ""}`}
+                >
+                  {lang === "en" ? "Another city" : "مدينة ثانية"} · {SHIPPING_COST} {t("riyal")}
+                </button>
+              </div>
+              {shipping.city !== LOCAL_CITY && shipping.city !== "" && (
+                <input
+                  type="text"
+                  required
+                  autoFocus
+                  placeholder={lang === "en" ? "City name" : "اسم المدينة"}
+                  value={shipping.city.trim()}
+                  onChange={(e) => setShipping({ ...shipping, city: e.target.value || " " })}
+                  className="w-full border rounded-lg px-3 py-2"
+                />
+              )}
             </div>
 
             <div>

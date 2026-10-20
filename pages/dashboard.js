@@ -1,383 +1,103 @@
 import { useEffect, useState } from "react";
-import Link from 'next/link';
 import Head from "next/head";
+import Link from "next/link";
 import { useAuth } from "../lib/useAuth";
 import { supabase } from "../lib/supabaseClient";
 import { useLanguage } from "../lib/LanguageContext";
-import { getT } from "../lib/translations";
-import OrderPickupForm from "../components/OrderPickupForm";
+
+// طلباتي: الزبون يتابع طلباته من الدفع إلى الوصول
+const STEPS = ["pending", "printing", "shipped", "completed"];
+const LABELS = {
+  ar: { pending_payment: "بانتظار الدفع", pending: "استلمنا طلبك", accepted: "استلمنا طلبك", printing: "قيد الطباعة", shipped: "في الطريق لك", completed: "وصل", cancelled: "ملغي" },
+  en: { pending_payment: "Awaiting payment", pending: "Order received", accepted: "Order received", printing: "Printing", shipped: "On its way", completed: "Delivered", cancelled: "Cancelled" },
+};
 
 export default function Dashboard() {
-  const { user, profile, loading: authLoading, profileError } = useAuth();
+  const { user, loading } = useAuth();
   const { lang } = useLanguage();
-  const t = getT(lang);
-
-  const STATUS_BADGE_CLASS = {
-    pending_payment: "bg-gray-200 text-gray-600",
-    pending: "bg-amber-100 text-amber-700",
-    accepted: "bg-blue-100 text-blue-700",
-    printing: "bg-blue-100 text-blue-700",
-    shipped: "bg-teal/10 text-teal",
-    completed: "bg-green-100 text-green-700",
-    cancelled: "bg-red-100 text-red-600",
-  };
-
-  const STATUS_LABELS = {
-    pending_payment: t("status_pending_payment"),
-    pending: t("status_pending"),
-    accepted: t("status_accepted"),
-    printing: t("status_printing"),
-    shipped: t("status_shipped"),
-    completed: t("status_completed"),
-    cancelled: t("status_cancelled"),
-  };
-
-  const ROLE_LABELS = {
-    customer: t("role_customer"),
-    designer: t("role_designer"),
-    printer: t("role_printer"),
-  };
-
-  const [orders, setOrders] = useState([]);
-  const [designs, setDesigns] = useState([]);
-  const [loadingData, setLoadingData] = useState(true);
-  const [trackingInputs, setTrackingInputs] = useState({});
-  const [deletingId, setDeletingId] = useState(null);
-  const [downloadingId, setDownloadingId] = useState(null);
+  const ar = lang !== "en";
+  const L = LABELS[ar ? "ar" : "en"];
+  const [orders, setOrders] = useState(null);
 
   useEffect(() => {
-    if (!user || !profile) return;
-
-    async function loadData() {
-      if (profile.role === "customer") {
-        const { data } = await supabase
-          .from("orders")
-          .select("*, designs(title)")
-          .eq("customer_id", user.id)
-          .order("created_at", { ascending: false });
-        setOrders(data || []);
-      }
-
-      if (profile.role === "printer") {
-        // الطابع يشوف فقط الطلبات المدفوعة فعليًا (payment_status = paid)
-        const { data } = await supabase
-          .from("orders")
-          .select("*, designs(title)")
-          .eq("payment_status", "paid")
-          .or(`status.eq.pending,printer_id.eq.${user.id}`)
-          .order("created_at", { ascending: false });
-        setOrders(data || []);
-      }
-
-      if (profile.role === "designer") {
-        const { data } = await supabase
-          .from("designs")
-          .select("*")
-          .eq("designer_id", user.id)
-          .order("created_at", { ascending: false });
-        setDesigns(data || []);
-      }
-
-      setLoadingData(false);
-    }
-
-    loadData();
-  }, [user, profile]);
-
-  async function acceptOrder(orderId) {
-    // نحدّث بس لو الطلب لسا pending — يمنع طابعَين يقبلون نفس الطلب بنفس اللحظة
-    const { data, error } = await supabase
+    if (!user) return;
+    supabase
       .from("orders")
-      .update({ printer_id: user.id, status: "accepted" })
-      .eq("id", orderId)
-      .eq("status", "pending")
-      .select();
+      .select("*, designs(title, preview_image_url)")
+      .eq("customer_id", user.id)
+      .neq("payment_status", "unpaid")
+      .order("created_at", { ascending: false })
+      .then(({ data }) => setOrders(data || []));
+  }, [user]);
 
-    if (error || !data || data.length === 0) {
-      alert(t("dash_order_taken"));
-      setOrders((prev) => prev.filter((o) => o.id !== orderId));
-      return;
-    }
-
-    setOrders((prev) =>
-      prev.map((o) =>
-        o.id === orderId ? { ...o, printer_id: user.id, status: "accepted" } : o
-      )
-    );
-  }
-
-  async function updateStatus(orderId, newStatus, extraFields = {}) {
-    const current = orders.find((order) => order.id === orderId);
-    if (!current || current.printer_id !== user.id) return;
-    const { data, error } = await supabase
-      .from("orders")
-      .update({ status: newStatus, ...extraFields })
-      .eq("id", orderId)
-      .eq("printer_id", user.id)
-      .eq("status", current.status)
-      .select()
-      .maybeSingle();
-
-    if (error || !data) {
-      alert(lang === "en" ? "Could not save the order status. Refresh and try again." : "تعذر حفظ حالة الطلب. حدّث الصفحة وحاول مجددًا.");
-      return;
-    }
-
-    setOrders((prev) =>
-      prev.map((o) =>
-        o.id === orderId ? { ...o, ...data } : o
-      )
-    );
-  }
-
-  function handleShip(orderId) {
-    const trackingNumber = (trackingInputs[orderId] || "").trim();
-    if (!trackingNumber) {
-      alert(t("dash_tracking_placeholder"));
-      return;
-    }
-    updateStatus(orderId, "shipped", { tracking_number: trackingNumber });
-  }
-
-  // الملفات خاصة؛ نطلب رابط تحميل مؤقت من السيرفر
-  async function downloadFile(target) {
-    const key = target.orderId || target.designId;
-    setDownloadingId(key);
-    try {
-      const { data } = await supabase.auth.getSession();
-      const response = await fetch("/api/files/download", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${data.session?.access_token || ""}` },
-        body: JSON.stringify(target),
-      });
-      const result = await response.json().catch(() => ({}));
-      if (!response.ok || !result.url) throw new Error(result.error);
-      window.location.href = result.url;
-    } catch (err) {
-      alert(err.message || (lang === "en" ? "Could not download the file." : "تعذر تحميل الملف"));
-    } finally {
-      setDownloadingId(null);
-    }
-  }
-
-  async function deleteDesign(designId) {
-    if (!window.confirm(t("dash_delete_confirm"))) return;
-    setDeletingId(designId);
-    const { error } = await supabase.from("designs").delete().eq("id", designId);
-    setDeletingId(null);
-    if (error) {
-      alert(t("dash_delete_error"));
-      return;
-    }
-    setDesigns((prev) => prev.filter((d) => d.id !== designId));
-  }
-
-  if (authLoading) return <p className="text-center">{t("dash_loading")}</p>;
-  if (!user) return <p className="text-center text-gray-600">{t("dash_login_required")}</p>;
-  if (!profile) {
+  if (loading) return <p className="text-center py-20">{ar ? "جاري التحميل…" : "Loading…"}</p>;
+  if (!user) {
     return (
-      <div className="text-center space-y-3">
-        <p className="text-red-600">
-          {t("dash_load_error")}
-          {profileError ? `: ${profileError}` : ""}.
-        </p>
-        <button
-          onClick={() => window.location.reload()}
-          className="bg-navy text-white text-sm px-4 py-2 rounded-lg"
-        >
-          {t("dash_retry")}
-        </button>
-      </div>
+      <p className="text-center py-20">
+        <Link href="/login" className="text-gold font-semibold">{ar ? "سجّل الدخول لمتابعة طلباتك" : "Log in to see your orders"}</Link>
+      </p>
     );
   }
-  if (loadingData) return <p className="text-center">{t("dash_loading")}</p>;
 
   return (
-    <div>
-      <Head>
-        <meta name="robots" content="noindex,nofollow" />
-      </Head>
-      <h1 className="text-2xl font-bold text-navy mb-6">
-        {t("dash_title")} — {profile?.full_name}{" "}
-        <span className="text-sm text-gray-500">
-          ({ROLE_LABELS[profile?.role] || profile?.role})
-        </span>
-      </h1>
+    <div className="max-w-3xl mx-auto">
+      <Head><title>{ar ? "طلباتي | Savana3D" : "My orders | Savana3D"}</title><meta name="robots" content="noindex,nofollow" /></Head>
+      <h1 className="font-bold text-3xl text-graphite dark:text-[#e7ebe6] mb-8">{ar ? "طلباتي" : "My orders"}</h1>
 
-      {['customer','printer'].includes(profile?.role) && <Link href="/quotes" className="block mb-6 bg-teal text-white rounded-xl p-4 font-bold">{lang === 'en' ? 'Print quotes — review before payment' : 'عروض الطباعة — مراجعة السعر قبل الدفع'}</Link>}
-      {/* لوحة الزبون */}
-      {profile?.role === "customer" && (
-        <div className="space-y-4">
-          {orders.length === 0 && <p className="text-gray-600">{t("dash_no_orders")}</p>}
-          {orders.map((o) => (
-            <div key={o.id} className="bg-white p-4 rounded-xl shadow-sm">
-              <div className="flex justify-between items-center mb-2">
-                <p className="font-bold">{o.designs?.title || t("dash_custom_design")}</p>
-                <span
-                  className={`text-xs px-3 py-1 rounded-full font-bold ${
-                    STATUS_BADGE_CLASS[o.status] || "bg-navy text-white"
-                  }`}
-                >
-                  {STATUS_LABELS[o.status]}
-                </span>
-              </div>
-              <p className="text-sm text-gray-500">
-                {o.total_price} {t("riyal")}
-                {o.shipping_cost > 0 && ` + ${t("cart_shipping")} ${o.shipping_cost} ${t("riyal")}`}
-              </p>
-              {o.shipping_city && (
-                <p className="text-sm text-gray-500 mt-1">
-                  {t("dash_shipping_to")}: {o.shipping_city} — {o.shipping_address}
-                </p>
-              )}
-              {o.tracking_number && (
-                <p className="text-sm text-teal font-bold mt-1">
-                  {t("dash_tracking_number")}: {o.tracking_number}
-                  {o.shipping_carrier && ` (${o.shipping_carrier})`}
-                </p>
-              )}
-              {o.tracking_url && (
-                <a
-                  href={o.tracking_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-block mt-2 text-sm bg-teal text-white px-4 py-1.5 rounded-lg"
-                >
-                  {t("dash_track_shipment")}
-                </a>
-              )}
-            </div>
-          ))}
+      {!orders ? (
+        <p>{ar ? "جاري تحميل طلباتك…" : "Loading your orders…"}</p>
+      ) : orders.length === 0 ? (
+        <div className="py-16 text-center">
+          <p className="font-bold text-lg mb-3">{ar ? "ما عندك طلبات للحين" : "No orders yet"}</p>
+          <Link href="/store" className="text-gold font-semibold">{ar ? "تصفّح المتجر" : "Browse the store"}</Link>
         </div>
-      )}
-
-      {/* لوحة صاحب الطابعة */}
-      {profile?.role === "printer" && (
-        <div className="space-y-4">
-          {orders.length === 0 && <p className="text-gray-600">{t("dash_no_available_orders")}</p>}
-          {orders.map((o) => (
-            <div key={o.id} className="bg-white p-4 rounded-xl shadow-sm">
-              <div className="flex justify-between items-center mb-2">
-                <p className="font-bold">{o.designs?.title || t("dash_custom_design")}</p>
-                <span className="bg-gray-200 text-xs px-3 py-1 rounded-full">
-                  {STATUS_LABELS[o.status]}
-                </span>
-              </div>
-              <p className="text-sm text-gray-500 mb-1">
-                {o.total_price} {t("riyal")}
-                {o.quantity > 1 && ` — ${t("dash_quantity")}: ${o.quantity}`}
-              </p>
-
-              {o.printer_id === user.id && (
-                <button
-                  onClick={() => downloadFile({ orderId: o.id })}
-                  disabled={downloadingId === o.id}
-                  className="inline-block mb-3 text-sm bg-navy text-white px-4 py-1.5 rounded-lg disabled:opacity-50"
-                >
-                  {downloadingId === o.id ? t("dash_loading") : t("dash_download_print_file")}
-                </button>
-              )}
-              {o.printer_id === user.id && o.notes && (
-                <p className="text-sm text-gray-600 mb-3">{t("dash_customer_notes")}: {o.notes}</p>
-              )}
-
-              {o.printer_id === user.id && o.shipping_name && (
-                <div className="text-sm text-gray-600 bg-gray-50 rounded-lg p-3 mb-3">
-                  <p>{t("dash_name_label")}: {o.shipping_name}</p>
-                  <p>{t("dash_phone_label")}: {o.shipping_phone}</p>
-                  <p>{t("dash_address_label")}: {o.shipping_city} — {o.shipping_address}</p>
+      ) : (
+        <ul className="space-y-4">
+          {orders.map((o) => {
+            const step = Math.max(0, STEPS.indexOf(o.status === "accepted" ? "pending" : o.status));
+            return (
+              <li key={o.id} className="rounded-2xl border border-line dark:border-[#323b37] bg-white dark:bg-[#1a201e] p-5">
+                <div className="flex gap-4">
+                  <div className="h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-[#e2e6df] dark:bg-[#232a27]">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    {o.designs?.preview_image_url && <img src={o.designs.preview_image_url} alt="" className="h-full w-full object-cover" />}
+                  </div>
+                  <div className="min-w-0 me-auto">
+                    <p className="font-bold text-graphite dark:text-[#e7ebe6]">{o.designs?.title || (ar ? "طلب طباعة" : "Print order")} × {o.quantity || 1}</p>
+                    <p className="text-sm text-[#5d6864] dark:text-gray-400">
+                      {[o.color, o.quality === "high" ? (ar ? "جودة عالية" : "High quality") : null].filter(Boolean).join(" · ")}
+                    </p>
+                    <p className="text-sm text-[#5d6864] dark:text-gray-400">
+                      {Number(o.total_price) + Number(o.shipping_cost || 0)} {ar ? "ريال" : "SAR"} · {new Date(o.created_at).toLocaleDateString(ar ? "ar-SA-u-ca-gregory" : "en-GB")}
+                    </p>
+                  </div>
+                  <span className="self-start rounded-full bg-gold/10 text-gold px-3 py-1 text-sm font-semibold">{L[o.status] || o.status}</span>
                 </div>
-              )}
 
-              {o.status === "pending" && (
-                <button
-                  onClick={() => acceptOrder(o.id)}
-                  className="bg-teal text-white text-sm px-4 py-1.5 rounded-lg"
-                >
-                  {t("dash_accept_order")}
-                </button>
-              )}
+                {o.status !== "cancelled" && (
+                  <ol className="mt-5 grid grid-cols-4 gap-1" aria-label={ar ? "حالة الطلب" : "Order progress"}>
+                    {STEPS.map((s, i) => (
+                      <li key={s} className="text-center">
+                        <span className={`block h-1.5 rounded-full ${i <= step ? "bg-gold" : "bg-[#e2e6df] dark:bg-[#323b37]"}`} />
+                        <span className={`mt-1.5 block text-[11px] sm:text-xs ${i <= step ? "text-graphite dark:text-[#e7ebe6] font-semibold" : "text-[#7b8681]"}`}>{L[s]}</span>
+                      </li>
+                    ))}
+                  </ol>
+                )}
 
-              {o.printer_id === user.id && o.status === "accepted" && (
-                <button
-                  onClick={() => updateStatus(o.id, "printing")}
-                  className="bg-navy text-white text-sm px-4 py-1.5 rounded-lg"
-                >
-                  {t("dash_start_printing")}
-                </button>
-              )}
-
-              {o.printer_id === user.id && o.status === "printing" && !o.oto_order_id && (
-                <OrderPickupForm orderId={o.id} lang={lang} />
-              )}
-              {o.printer_id === user.id && o.status === "printing" && o.oto_order_id && (
-                <p className="text-sm text-gray-600 bg-gray-50 rounded-lg p-3 my-3">
-                  {t("dash_oto_prepared")}: {o.oto_order_id}
-                  {o.shipping_status && ` — ${o.shipping_status}`}
-                </p>
-              )}
-
-              {o.printer_id === user.id && o.status === "printing" && (
-                <div className="flex gap-2 items-center">
-                  <input
-                    type="text"
-                    placeholder={t("dash_tracking_placeholder")}
-                    className="border rounded-lg px-3 py-1.5 text-sm flex-1"
-                    value={trackingInputs[o.id] || ""}
-                    onChange={(e) =>
-                      setTrackingInputs({ ...trackingInputs, [o.id]: e.target.value })
-                    }
-                  />
-                  <button
-                    onClick={() => handleShip(o.id)}
-                    className="bg-navy text-white text-sm px-4 py-1.5 rounded-lg whitespace-nowrap"
-                  >
-                    {t("dash_confirm_shipping")}
-                  </button>
-                </div>
-              )}
-
-              {o.printer_id === user.id && o.status === "shipped" && (
-                <p className="text-sm text-teal font-bold">
-                  {t("dash_shipped_prefix")}: {o.tracking_number}
-                </p>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* لوحة المصمم */}
-      {profile?.role === "designer" && (
-        <div className="space-y-4">
-          {designs.length === 0 && <p className="text-gray-600">{t("dash_no_designs")}</p>}
-          {designs.map((d) => (
-            <div key={d.id} className="bg-white p-4 rounded-xl shadow-sm flex justify-between items-center gap-3">
-              <div>
-                <p className="font-bold">{d.title}</p>
-                <p className="text-sm text-gray-500">{d.pricing_mode === 'quote' ? (lang === 'en' ? 'Designer share: 10%' : 'نصيب المصمم: ١٠٪') : `${d.price} ${t('riyal')}`}</p>
-              </div>
-              <div className="flex items-center gap-2 shrink-0">
-              {d.file_url && (
-                <button
-                  onClick={() => downloadFile({ designId: d.id })}
-                  disabled={downloadingId === d.id}
-                  className="bg-navy text-white text-sm px-4 py-1.5 rounded-lg hover:opacity-90 whitespace-nowrap disabled:opacity-50"
-                >
-                  {t("dash_download_file")}
-                </button>
-              )}
-              <button
-                onClick={() => deleteDesign(d.id)}
-                disabled={deletingId === d.id}
-                className="text-red-600 text-sm px-3 py-1.5 rounded-lg hover:bg-red-50 disabled:opacity-50 whitespace-nowrap"
-              >
-                {deletingId === d.id ? t("dash_deleting") : t("dash_delete_design")}
-              </button>
-              </div>
-            </div>
-          ))}
-        </div>
+                {(o.tracking_number || o.tracking_url) && (
+                  <p className="mt-4 text-sm">
+                    {ar ? "رقم التتبع" : "Tracking"}: <span className="font-semibold">{o.tracking_number}</span>
+                    {o.shipping_carrier && ` (${o.shipping_carrier})`}
+                    {o.tracking_url && (
+                      <a href={o.tracking_url} target="_blank" rel="noopener noreferrer" className="ms-3 text-gold font-semibold">{ar ? "تتبّع الشحنة" : "Track"}</a>
+                    )}
+                  </p>
+                )}
+              </li>
+            );
+          })}
+        </ul>
       )}
     </div>
   );
