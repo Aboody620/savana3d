@@ -75,3 +75,15 @@ test("a payment for a smaller amount does not confirm the order", async () => {
   assert.equal(result.status, 400);
   assert.equal(order.payment_status, "unpaid");
 });
+
+test("payment is blocked when Moyasar test and live keys are mixed", async () => {
+  const { paymentReadiness } = await import(`data:text/javascript;base64,${Buffer.from(config).toString("base64")}`);
+  const live = { NEXT_PUBLIC_MOYASAR_KEY: "pk_live_abc123", MOYASAR_SECRET_KEY: "sk_live_def456" };
+  assert.equal(paymentReadiness(live).ready, true);
+  assert.equal(paymentReadiness({ ...live, NEXT_PUBLIC_MOYASAR_KEY: "pk_test_abc123" }).problem, "key_mode_mismatch");
+  assert.equal(paymentReadiness({ NEXT_PUBLIC_MOYASAR_PUBLISHABLE_KEY: "pk_test_abc", MOYASAR_SECRET_KEY: "sk_test_x1" }).ready, true);
+  assert.equal(paymentReadiness({ NEXT_PUBLIC_MOYASAR_KEY: "pk_test_abc" }).problem, "missing_secret_key");
+  assert.equal(paymentReadiness({ MOYASAR_SECRET_KEY: "sk_live_x" }).problem, "missing_publishable_key");
+  const shown = JSON.stringify(paymentReadiness(live));
+  assert.ok(!shown.includes("abc123") && !shown.includes("def456"));
+});
