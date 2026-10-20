@@ -45,101 +45,63 @@ export default function DesignDetail() {
 
   return (
     <div className="max-w-5xl mx-auto">
-      <Link
-        href="/store"
-        className="inline-flex items-center gap-1 text-graphite dark:text-[#e7ebe6] text-sm font-medium mb-5 hover:text-gold"
-      >
-        <span>{dir === "rtl" ? "→" : "←"}</span>
-        <span>{t("detail_back")}</span>
+      <Link href="/store" className="inline-flex items-center gap-1 text-sm font-medium text-[#5d6864] dark:text-gray-400 mb-4 hover:text-gold">
+        <span aria-hidden="true">{dir === "rtl" ? "→" : "←"}</span>
+        <span>{lang === "ar" ? "المتجر" : "Store"}</span>
       </Link>
 
-      <div className="grid gap-6 md:gap-10 md:grid-cols-[1.05fr_0.95fr] items-start">
-        <div className="rounded-3xl overflow-hidden border border-line dark:border-[#323b37] bg-[#e2e6df] dark:bg-[#232a27] md:sticky md:top-24">
-        <div className="aspect-square">
-          {images.length > 0 ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={images[Math.min(activeImage, images.length - 1)]}
-              alt={design.title}
-              className="h-full w-full object-contain"
-            />
-          ) : (
-            <div className="h-full w-full flex items-center justify-center text-gray-300">
-              {t("store_no_preview")}
-            </div>
-          )}
-        </div>
-        {images.length > 1 && (
-          <div className="flex gap-2 overflow-x-auto p-3 border-t border-line dark:border-[#323b37]" role="list">
-            {images.map((url, index) => (
-              <button
-                key={url}
-                type="button"
-                onClick={() => setActiveImage(index)}
-                aria-label={`${design.title} ${index + 1}`}
-                aria-current={index === activeImage}
-                className={`h-16 w-16 flex-shrink-0 rounded-lg overflow-hidden border-2 ${index === activeImage ? "border-teal" : "border-transparent"}`}
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={url} alt="" loading="lazy" className="h-full w-full object-cover" />
-              </button>
-            ))}
-          </div>
-        )}
-
-        </div>
-        <div className="md:pt-2">
-          <h1 className="font-display font-bold text-3xl sm:text-4xl text-graphite dark:text-[#e7ebe6] leading-tight mb-3">{design.title}</h1>
-
-          <div className="flex flex-wrap gap-2 text-sm text-[#4a5551] dark:text-gray-400 mb-5">
-            {design.print_time_hours && (
-              <span className="rounded-full border border-line dark:border-[#323b37] px-3 py-1">{t("card_print_time")}: {design.print_time_hours} {t("card_hours")}</span>
+      <div className="grid gap-6 md:gap-12 md:grid-cols-2 items-start">
+        <div className="md:sticky md:top-24">
+          <div className="aspect-square rounded-3xl overflow-hidden bg-[#e2e6df] dark:bg-[#232a27]">
+            {images.length > 0 ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={images[Math.min(activeImage, images.length - 1)]} alt={design.title} className="h-full w-full object-contain" />
+            ) : (
+              <div className="h-full w-full flex items-center justify-center text-[#7b8681]">{t("store_no_preview")}</div>
             )}
-            {design.material && <span className="rounded-full border border-line dark:border-[#323b37] px-3 py-1">{design.material}</span>}
-            <span className="rounded-full border border-line dark:border-[#323b37] px-3 py-1">{design.multi_color ? t("card_colors_multi") : t("card_colors_one")}</span>
           </div>
-
-          <p className="text-[#4a5551] dark:text-gray-400 mb-7 whitespace-pre-wrap max-w-[60ch]">{design.description}</p>
-
-          {isQuote ? (
-            <QuoteRequestForm designId={design.id} lang={lang} />
-          ) : (
-            <>
-          <div className="flex items-baseline justify-between border-y border-line dark:border-[#323b37] py-4 mb-6">
-            <span className="text-gray-500 text-sm">{t("detail_price_label")}</span>
-            <span className="font-display text-3xl font-bold text-gold">{design.price} {t("riyal")}</span>
-          </div>
-
-          {!added ? (
-            <button
-              onClick={handleAddToCart}
-              className="w-full bg-gold text-white py-3.5 rounded-xl font-display font-semibold hover:bg-[#bf3e0b] transition-colors"
-            >
-              {t("store_add_to_cart")}
-            </button>
-          ) : (
-            <div className="space-y-3">
-              <div className="bg-teal/10 text-teal text-center py-3 rounded-xl font-bold">
-                {t("detail_added")}
-              </div>
-              <div className="flex gap-3">
-                <Link
-                  href="/cart"
-                  className="flex-1 text-center bg-teal text-white py-3 rounded-xl font-bold hover:opacity-90 transition"
+          {images.length > 1 && (
+            <div className="flex gap-2 overflow-x-auto mt-3">
+              {images.map((url, index) => (
+                <button
+                  key={url}
+                  type="button"
+                  onClick={() => setActiveImage(index)}
+                  aria-label={`${design.title} ${index + 1}`}
+                  aria-current={index === activeImage}
+                  className={`h-16 w-16 shrink-0 rounded-xl overflow-hidden ring-2 ${index === activeImage ? "ring-gold" : "ring-transparent opacity-70"}`}
                 >
-                  {t("detail_go_to_cart")}
-                </Link>
-                <Link
-                  href="/store"
-                  className="flex-1 text-center bg-gray-100 text-navy py-3 rounded-xl font-bold hover:bg-gray-200 transition"
-                >
-                  {t("detail_continue_shopping")}
-                </Link>
-              </div>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={url} alt="" loading="lazy" className="h-full w-full object-cover" />
+                </button>
+              ))}
             </div>
           )}
-            </>
+        </div>
+
+        <div className="md:pt-4">
+          <h1 className="font-bold text-3xl sm:text-4xl text-graphite dark:text-[#e7ebe6] leading-tight">{design.title}</h1>
+          {!isQuote && <p className="mt-3 text-3xl font-bold text-gold">{design.price} {t("riyal")}</p>}
+          {design.description && (
+            <p className="mt-5 text-[#4a5551] dark:text-gray-400 whitespace-pre-wrap max-w-[60ch]">{design.description}</p>
           )}
+          {design.material && (
+            <p className="mt-3 text-sm text-[#7b8681]">{lang === "ar" ? "الخامة" : "Material"}: {design.material}</p>
+          )}
+
+          <div className="mt-7">
+            {isQuote ? (
+              <QuoteRequestForm designId={design.id} lang={lang} />
+            ) : added ? (
+              <Link href="/cart" className="block w-full text-center bg-graphite text-white py-4 rounded-2xl font-bold hover:opacity-90">
+                {lang === "ar" ? "انضاف للسلة · روح للسلة" : "Added · Go to cart"}
+              </Link>
+            ) : (
+              <button onClick={handleAddToCart} className="w-full bg-gold text-white py-4 rounded-2xl font-bold hover:bg-[#bf3e0b] transition-colors">
+                {t("store_add_to_cart")}
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </div>
