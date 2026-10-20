@@ -91,7 +91,7 @@ export default function Home() {
       {/* الواجهة: عنوان كبير ومزهرية تنطبع */}
       <section className="grid items-center gap-6 md:grid-cols-[1.15fr_0.85fr] pt-4 pb-14 md:pt-10 md:pb-20">
         <div>
-          <h1 className="font-display font-extrabold text-graphite dark:text-[#e7ebe6] text-[2.35rem] leading-[1.18] sm:text-5xl md:text-[3.6rem] md:leading-[1.12] max-w-[14ch]">
+          <h1 className="font-bold text-graphite dark:text-[#e7ebe6] text-[2.2rem] leading-[1.3] sm:text-5xl md:text-[3.3rem] md:leading-[1.25] max-w-[16ch]">
             {ar ? "اطبع أي تصميم ثلاثي الأبعاد، بدون ما تملك طابعة" : "Print any 3D design without owning a printer"}
           </h1>
           <p className="mt-5 text-lg text-[#4a5551] dark:text-gray-400 max-w-[46ch]">

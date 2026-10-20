@@ -81,7 +81,7 @@ export default function Store() {
       </Head>
 
       <header className="pt-2 pb-8">
-        <h1 className="font-display font-extrabold text-[2rem] sm:text-5xl leading-tight text-graphite dark:text-[#e7ebe6] mb-3">{t("store_title")}</h1>
+        <h1 className="font-display font-bold text-[2rem] sm:text-5xl leading-tight text-graphite dark:text-[#e7ebe6] mb-3">{t("store_title")}</h1>
         <p className="text-[#4a5551] dark:text-gray-400 max-w-[52ch] text-base sm:text-lg">{t("store_subtitle")}</p>
       </header>
 

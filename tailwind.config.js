@@ -16,8 +16,9 @@ module.exports = {
         graphite: "#1C2422",
       },
       fontFamily: {
-        display: ["Alexandria", "IBM Plex Sans Arabic", "system-ui", "sans-serif"],
-        sans: ["IBM Plex Sans Arabic", "system-ui", "Segoe UI", "Tahoma", "sans-serif"],
+        // نفس خط الموقع الأصلي: خط النظام (Segoe UI على ويندوز، والخط الافتراضي بالجوال)
+        display: ["Segoe UI", "system-ui", "-apple-system", "Tahoma", "Arial", "sans-serif"],
+        sans: ["Segoe UI", "system-ui", "-apple-system", "Tahoma", "Arial", "sans-serif"],
       },
       keyframes: {
         layerIn: {

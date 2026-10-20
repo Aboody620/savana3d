@@ -1,12 +1,4 @@
 import Head from "next/head";
-import "@fontsource/alexandria/500.css";
-import "@fontsource/alexandria/600.css";
-import "@fontsource/alexandria/700.css";
-import "@fontsource/alexandria/800.css";
-import "@fontsource/ibm-plex-sans-arabic/400.css";
-import "@fontsource/ibm-plex-sans-arabic/500.css";
-import "@fontsource/ibm-plex-sans-arabic/600.css";
-import "@fontsource/ibm-plex-sans-arabic/700.css";
 import "../styles/globals.css";
 import Navbar from "../components/Navbar";
 import { ThemeProvider } from "../lib/ThemeContext";

@@ -89,7 +89,7 @@ export default function DesignDetail() {
 
         </div>
         <div className="md:pt-2">
-          <h1 className="font-display font-extrabold text-3xl sm:text-4xl text-graphite dark:text-[#e7ebe6] leading-tight mb-3">{design.title}</h1>
+          <h1 className="font-display font-bold text-3xl sm:text-4xl text-graphite dark:text-[#e7ebe6] leading-tight mb-3">{design.title}</h1>
 
           <div className="flex flex-wrap gap-2 text-sm text-[#4a5551] dark:text-gray-400 mb-5">
             {design.print_time_hours && (
