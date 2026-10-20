@@ -42,7 +42,7 @@ export default function Dashboard() {
   return (
     <div className="max-w-3xl mx-auto">
       <Head><title>{ar ? "طلباتي | Savana3D" : "My orders | Savana3D"}</title><meta name="robots" content="noindex,nofollow" /></Head>
-      <h1 className="font-bold text-3xl text-graphite dark:text-[#e7ebe6] mb-8">{ar ? "طلباتي" : "My orders"}</h1>
+      <h1 className="font-bold text-3xl text-graphite dark:text-[#F2F2EF] mb-8">{ar ? "طلباتي" : "My orders"}</h1>
 
       {!orders ? (
         <p>{ar ? "جاري تحميل طلباتك…" : "Loading your orders…"}</p>
@@ -56,18 +56,18 @@ export default function Dashboard() {
           {orders.map((o) => {
             const step = Math.max(0, STEPS.indexOf(o.status === "accepted" ? "pending" : o.status));
             return (
-              <li key={o.id} className="rounded-2xl border border-line dark:border-[#323b37] bg-white dark:bg-[#1a201e] p-5">
+              <li key={o.id} className="rounded-2xl border border-line dark:border-[#2E2E2B] bg-white dark:bg-[#191918] p-5">
                 <div className="flex gap-4">
-                  <div className="h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-[#e2e6df] dark:bg-[#232a27]">
+                  <div className="h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-[#ECECE8] dark:bg-[#222220]">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     {o.designs?.preview_image_url && <img src={o.designs.preview_image_url} alt="" className="h-full w-full object-cover" />}
                   </div>
                   <div className="min-w-0 me-auto">
-                    <p className="font-bold text-graphite dark:text-[#e7ebe6]">{o.designs?.title || (ar ? "طلب طباعة" : "Print order")} × {o.quantity || 1}</p>
-                    <p className="text-sm text-[#5d6864] dark:text-gray-400">
+                    <p className="font-bold text-graphite dark:text-[#F2F2EF]">{o.designs?.title || (ar ? "طلب طباعة" : "Print order")} × {o.quantity || 1}</p>
+                    <p className="text-sm text-[#6F6F6A] dark:text-gray-400">
                       {[o.color, o.quality === "high" ? (ar ? "جودة عالية" : "High quality") : null].filter(Boolean).join(" · ")}
                     </p>
-                    <p className="text-sm text-[#5d6864] dark:text-gray-400">
+                    <p className="text-sm text-[#6F6F6A] dark:text-gray-400">
                       {Number(o.total_price) + Number(o.shipping_cost || 0)} {ar ? "ريال" : "SAR"} · {new Date(o.created_at).toLocaleDateString(ar ? "ar-SA-u-ca-gregory" : "en-GB")}
                     </p>
                   </div>
@@ -78,8 +78,8 @@ export default function Dashboard() {
                   <ol className="mt-5 grid grid-cols-4 gap-1" aria-label={ar ? "حالة الطلب" : "Order progress"}>
                     {STEPS.map((s, i) => (
                       <li key={s} className="text-center">
-                        <span className={`block h-1.5 rounded-full ${i <= step ? "bg-gold" : "bg-[#e2e6df] dark:bg-[#323b37]"}`} />
-                        <span className={`mt-1.5 block text-[11px] sm:text-xs ${i <= step ? "text-graphite dark:text-[#e7ebe6] font-semibold" : "text-[#7b8681]"}`}>{L[s]}</span>
+                        <span className={`block h-1.5 rounded-full ${i <= step ? "bg-gold" : "bg-[#ECECE8] dark:bg-[#2E2E2B]"}`} />
+                        <span className={`mt-1.5 block text-[11px] sm:text-xs ${i <= step ? "text-graphite dark:text-[#F2F2EF] font-semibold" : "text-[#8A8A84]"}`}>{L[s]}</span>
                       </li>
                     ))}
                   </ol>
