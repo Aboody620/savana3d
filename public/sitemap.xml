@@ -16,4 +16,7 @@
     <loc>https://savana3d.com/login</loc>
     <priority>0.3</priority>
   </url>
+  <url><loc>https://savana3d.com/terms</loc></url>
+  <url><loc>https://savana3d.com/privacy</loc></url>
+  <url><loc>https://savana3d.com/refund</loc></url>
 </urlset>

@@ -277,6 +277,12 @@ export default function CustomOrder() {
         {activeCheckout && (
           <div>
             <h2 className="font-bold text-navy mb-4">{t("cart_complete_payment")}</h2>
+            <p className="text-xs text-gray-500 mb-3">
+              {lang === "en" ? "By paying you agree to the " : "بإتمام الدفع أنت توافق على "}
+              <a href="/terms" className="underline">{lang === "en" ? "terms" : "الشروط والأحكام"}</a>
+              {lang === "en" ? " and " : " و"}
+              <a href="/refund" className="underline">{lang === "en" ? "refund policy" : "سياسة الاسترجاع"}</a>.
+            </p>
             <div className="mysr-form"></div>
           </div>
         )}
