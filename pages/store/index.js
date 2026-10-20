@@ -97,7 +97,6 @@ export default function Store() {
                 : "bg-transparent text-graphite dark:text-[#e7ebe6] border-line dark:border-[#323b37] hover:border-graphite"
             }`}
           >
-            <span>{c.icon}</span>
             <span>{t(c.key)}</span>
           </button>
         ))}
@@ -217,7 +216,7 @@ export default function Store() {
                   <h3 className="font-display font-semibold text-graphite dark:text-[#e7ebe6] text-[0.95rem] md:text-base leading-snug line-clamp-2 mb-1">
                     {d.title}
                   </h3>
-                  <p className="font-display font-bold text-gold text-base md:text-lg mb-1.5">
+                  <p className={`font-display font-bold text-gold mb-1.5 ${d.pricing_mode === "quote" ? "text-sm md:text-base" : "text-base md:text-lg"}`}>
                     {d.pricing_mode === "quote" ? (lang === "ar" ? "السعر حسب الطلب" : "Price on request") : `${d.price} ${t("riyal")}`}
                   </p>
                   <p className="text-[11px] md:text-xs text-[#5d6864] dark:text-gray-400 leading-relaxed mb-3">
