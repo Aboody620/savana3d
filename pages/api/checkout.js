@@ -1,3 +1,4 @@
+import { paymentReadiness } from "../../lib/paymentConfig";
 import { supabaseAdmin } from "../../lib/supabaseAdmin";
 import {
   CheckoutError,
@@ -14,6 +15,13 @@ export default async function handler(req, res) {
 
   const bearer = req.headers.authorization?.match(/^Bearer (.+)$/)?.[1];
   if (!bearer) return res.status(401).json({ error: "يرجى تسجيل الدخول" });
+
+  // ما ننشئ طلب إذا ميسر مو مضبوط — عشان ما يدفع الزبون ويفشل التأكيد بعدين
+  const payment = paymentReadiness(process.env);
+  if (!payment.ready) {
+    console.error("moyasar not ready:", payment.problem);
+    return res.status(503).json({ error: "الدفع غير متاح مؤقتًا. حاول بعد شوي." });
+  }
 
   try {
     const { data: auth, error: authError } = await supabaseAdmin.auth.getUser(bearer);

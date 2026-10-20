@@ -1,3 +1,4 @@
+import { paymentReadiness } from "../../lib/paymentConfig";
 import { supabaseAdmin } from "../../lib/supabaseAdmin";
 import { CheckoutError, validateShipping } from "../../lib/checkout";
 import { quoteRecipient } from "../../lib/quoteOrder";
@@ -11,6 +12,13 @@ export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
   const bearer = req.headers.authorization?.match(/^Bearer (.+)$/)?.[1];
   if (!bearer) return res.status(401).json({ error: "يرجى تسجيل الدخول" });
+
+  // ما ننشئ طلب إذا ميسر مو مضبوط — عشان ما يدفع الزبون ويفشل التأكيد بعدين
+  const payment = paymentReadiness(process.env);
+  if (!payment.ready) {
+    console.error("moyasar not ready:", payment.problem);
+    return res.status(503).json({ error: "الدفع غير متاح مؤقتًا. حاول بعد شوي." });
+  }
 
   const { id, name, phone, address } = req.body || {};
   if (typeof id !== "string" || !UUID.test(id)) return res.status(400).json({ error: "طلب غير صالح" });
