@@ -1,42 +1,54 @@
 import Head from "next/head";
 import Link from "next/link";
 import { useLanguage } from "../lib/LanguageContext";
-import { getT } from "../lib/translations";
-import WaterHero from "../components/WaterHero";
-import { PrintLayerPattern } from "../components/PrintDecor";
+import PrintingVase from "../components/PrintingVase";
 
 export default function Home() {
   const { lang } = useLanguage();
-  const t = getT(lang);
+
+  const ar = lang === "ar";
+  const steps = ar
+    ? [
+        { title: "اختر تصميم أو ارفع ملفك", text: "حدد الخامة واللون والكمية ومدينة التوصيل." },
+        { title: "صاحب طابعة يسعّره", text: "تشوف سعر المنتج والشحن قبل أي دفع." },
+        { title: "توافق وتدفع", text: "بمدى أو فيزا أو ماستركارد، والدفع محمي." },
+        { title: "يطبعه ويشحنه لك", text: "تتابع الشحنة برقم تتبع من لوحتك." },
+      ]
+    : [
+        { title: "Pick a design or upload yours", text: "Choose material, color, quantity and delivery city." },
+        { title: "A printer owner quotes it", text: "See the product and shipping price before paying anything." },
+        { title: "Approve and pay", text: "With mada, Visa or Mastercard through a secure checkout." },
+        { title: "Printed and shipped to you", text: "Follow the shipment with a tracking number on your dashboard." },
+      ];
 
   const faqs =
     lang === "ar"
       ? [
           {
             q: "كيف أطبع تصميمي ثلاثي الأبعاد بدون ما أملك طابعة؟",
-            a: "ارفع ملف التصميم (STL) على Savana3D، واختر صاحب طابعة قريب منك من الشبكة، وهو يطبعه ويوصله لك.",
+            a: "اختر تصميم من المتجر أو ارفع ملفك (STL أو OBJ أو 3MF)، وصاحب طابعة يرسل لك السعر. توافق وتدفع، وهو يطبعه ويشحنه لك.",
           },
           {
             q: "هل أقدر أبيع تصاميمي ثلاثية الأبعاد على المنصة؟",
-            a: "إي، سجّل كمصمم وارفع تصاميمك الجاهزة بمتجر Savana3D، وتاخذ نسبتك من كل عملية بيع.",
+            a: "إي، سجّل كمصمم وارفع تصاميمك مع صورها، وتاخذ ١٠٪ من قيمة المنتج في كل طلب مكتمل.",
           },
           {
             q: "كيف أربح كصاحب طابعة ثلاثية الأبعاد؟",
-            a: "سجّل كصاحب طابعة، واقبل طلبات الطباعة اللي تناسب وقتك الفاضي، وتاخذ مقابل كل طلب تنفذه.",
+            a: "سجّل كصاحب طابعة، وسعّر الطلبات اللي تناسبك. تبدأ الطباعة بعد ما يدفع الزبون، وتاخذ قيمة الطلب اللي حددتها.",
           },
         ]
       : [
           {
             q: "How can I print my 3D design without owning a printer?",
-            a: "Upload your STL file to Savana3D, choose a nearby printer owner from the network, and they'll print and deliver it to you.",
+            a: "Pick a design from the store or upload your file (STL, OBJ or 3MF). A printer owner sends you a price; once you approve and pay, they print and ship it.",
           },
           {
             q: "Can I sell my 3D designs on the platform?",
-            a: "Yes, register as a designer and upload your ready designs to the Savana3D store to earn a share of every sale.",
+            a: "Yes. Join as a designer, upload your designs with photos, and earn 10% of the product value on every completed order.",
           },
           {
             q: "How do I earn as a 3D printer owner?",
-            a: "Register as a printer owner, accept printing requests that fit your free time, and earn for every order you fulfill.",
+            a: "Join as a printer owner and quote the requests that suit you. You print after the customer pays and earn the price you set.",
           },
         ];
 
@@ -76,105 +88,112 @@ export default function Home() {
         />
       </Head>
 
-      <div className="text-center">
-        <WaterHero className="h-[480px] sm:h-[560px] flex items-center justify-center rounded-b-3xl">
-          <div className="px-4">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/logo-lockup.png"
-              alt="Savana3D"
-              className="h-28 sm:h-36 mx-auto mb-6 drop-shadow-lg"
-            />
-
-            <h1 className="text-3xl sm:text-4xl font-black text-white mb-4 drop-shadow-md">
-              {t("home_title")}
-            </h1>
-            <p className="text-base sm:text-lg text-white/90 mb-8 max-w-2xl mx-auto drop-shadow-sm">
-              {t("home_subtitle")}
-            </p>
-
-            <div className="flex justify-center gap-4">
-              <Link
-                href="/store"
-                className="bg-white text-navy px-6 py-3 rounded-lg font-bold hover:opacity-90 transition-opacity"
-              >
-                {t("home_browse_store")}
-              </Link>
-              <Link
-                href="/signup"
-                className="bg-gold text-white px-6 py-3 rounded-lg font-bold hover:opacity-90 transition-opacity"
-              >
-                {t("home_start_now")}
-              </Link>
-            </div>
+      {/* الواجهة: عنوان كبير ومزهرية تنطبع */}
+      <section className="grid items-center gap-6 md:grid-cols-[1.15fr_0.85fr] pt-4 pb-14 md:pt-10 md:pb-20">
+        <div>
+          <h1 className="font-display font-extrabold text-graphite dark:text-[#e7ebe6] text-[2.35rem] leading-[1.18] sm:text-5xl md:text-[3.6rem] md:leading-[1.12] max-w-[14ch]">
+            {ar ? "اطبع أي تصميم ثلاثي الأبعاد، بدون ما تملك طابعة" : "Print any 3D design without owning a printer"}
+          </h1>
+          <p className="mt-5 text-lg text-[#4a5551] dark:text-gray-400 max-w-[46ch]">
+            {ar
+              ? "اختر تصميم من المتجر أو ارفع ملفك، وصاحب طابعة قريب منك يسعّره ويطبعه ويوصله لبابك."
+              : "Pick a design from the store or upload your own file. A printer owner near you quotes it, prints it, and ships it to your door."}
+          </p>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <Link href="/store" className="bg-gold text-white px-6 py-3.5 rounded-xl font-display font-semibold hover:bg-[#bf3e0b] transition-colors">
+              {ar ? "تصفّح التصاميم" : "Browse designs"}
+            </Link>
+            <Link href="/custom-order" className="px-6 py-3.5 rounded-xl font-display font-semibold border-2 border-graphite/80 text-graphite dark:text-[#e7ebe6] dark:border-[#e7ebe6]/60 hover:bg-graphite hover:text-white transition-colors">
+              {ar ? "ارفع ملفك" : "Upload your file"}
+            </Link>
           </div>
-        </WaterHero>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-16 mb-16 px-4 max-w-5xl mx-auto text-right">
-          <div className="group bg-white p-6 rounded-xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-200 border border-transparent hover:border-navy/10">
-            <div className="h-11 w-11 rounded-lg bg-navy/10 text-navy flex items-center justify-center mb-3">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 16V4M12 4l-5 5M12 4l5 5" />
-                <path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3" />
-              </svg>
-            </div>
-            <h3 className="font-bold text-navy mb-2">{t("home_customer_title")}</h3>
-            <p className="text-gray-600 text-sm">{t("home_customer_desc")}</p>
-          </div>
-          <div className="group bg-white p-6 rounded-xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-200 border border-transparent hover:border-teal/10">
-            <div className="h-11 w-11 rounded-lg bg-teal/10 text-teal flex items-center justify-center mb-3">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 21a9 9 0 1 1 0-18c4.5 0 8 3 8 6.5 0 2-1.5 3.5-3.5 3.5H15a1.5 1.5 0 0 0-1 2.6c.3.3.5.7.5 1.2 0 1.2-1.1 2.2-2.5 2.2Z" />
-                <circle cx="7.5" cy="10.5" r="1" fill="currentColor" stroke="none" />
-                <circle cx="12" cy="7.5" r="1" fill="currentColor" stroke="none" />
-                <circle cx="16.5" cy="10.5" r="1" fill="currentColor" stroke="none" />
-              </svg>
-            </div>
-            <h3 className="font-bold text-teal mb-2">{t("home_designer_title")}</h3>
-            <p className="text-gray-600 text-sm">{t("home_designer_desc")}</p>
-          </div>
-          <div className="group bg-white p-6 rounded-xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-200 border border-transparent hover:border-gold/10">
-            <div className="h-11 w-11 rounded-lg bg-gold/10 text-gold flex items-center justify-center mb-3">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M6 9V3h12v6" />
-                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
-                <rect x="6" y="14" width="12" height="7" />
-              </svg>
-            </div>
-            <h3 className="font-bold text-gold mb-2">{t("home_printer_title")}</h3>
-            <p className="text-gray-600 text-sm">{t("home_printer_desc")}</p>
-          </div>
-        </div>
-
-        {/* فاصل بصري يحاكي طبقات الطباعة */}
-        <div className="relative h-8 max-w-5xl mx-auto mb-4 overflow-hidden rounded-full bg-navy/90">
-          <PrintLayerPattern opacity={0.35} />
-        </div>
-
-        <div className="max-w-3xl mx-auto px-4 mb-16 text-right">
-          <h2 className="text-xl sm:text-2xl font-bold text-navy mb-4">
-            {lang === "ar" ? "منصة طباعة ثلاثية الأبعاد في السعودية" : "3D Printing Platform in Saudi Arabia"}
-          </h2>
-          <p className="text-gray-600 text-sm sm:text-base leading-relaxed">
-            {lang === "ar"
-              ? "Savana3D هي منصة سعودية متخصصة في خدمات الطباعة الثلاثية الأبعاد، تربط بين ثلاثة أطراف: العميل اللي يبغى يطبع تصميم، المصمم اللي يبيع تصاميمه الجاهزة، وصاحب الطابعة اللي ينفّذ الطلب. سواء كنت تدور على مكان يطبع لك تصميمك الخاص، تبغى تشتري تصميم 3D جاهز من متجرنا، أو عندك طابعة ثلاثية الأبعاد وتبغى تربح من وقتها الفاضي — Savana3D يجمعكم بشبكة واحدة، بدون ما تحتاج تملك طابعة بنفسك."
-              : "Savana3D is a Saudi platform for 3D printing services, connecting customers who want to print a design, designers who sell ready-made 3D designs, and printer owners who fulfill the orders. Whether you're looking to print your own design, buy a ready 3D design from our store, or own a 3D printer and want to earn from your idle time — Savana3D brings you all together in one network."}
+          <p className="mt-6 text-sm text-[#5d6864] dark:text-gray-500">
+            {ar ? "تدفع بعد ما توافق على السعر · مدى وفيزا وماستركارد" : "You pay only after approving the price · mada, Visa, Mastercard"}
           </p>
         </div>
-
-        <div className="max-w-3xl mx-auto px-4 mb-16 text-right">
-          <h2 className="text-xl sm:text-2xl font-bold text-navy mb-4">
-            {lang === "ar" ? "أسئلة شائعة" : "Frequently Asked Questions"}
-          </h2>
-          <div className="space-y-4">
-            {faqs.map((faq, i) => (
-              <details key={i} className="bg-white rounded-xl shadow-sm p-4">
-                <summary className="font-bold text-navy cursor-pointer">{faq.q}</summary>
-                <p className="text-gray-600 text-sm mt-2">{faq.a}</p>
-              </details>
-            ))}
-          </div>
+        <div className="order-first md:order-none text-graphite dark:text-[#e7ebe6]">
+          <PrintingVase className="w-full max-w-[300px] md:max-w-[400px] mx-auto" />
         </div>
+      </section>
+
+      {/* مسار الطلب — تسلسل حقيقي */}
+      <section aria-labelledby="flow-title" className="py-14 border-t border-line dark:border-[#323b37]">
+        <h2 id="flow-title" className="font-display font-bold text-2xl sm:text-3xl text-graphite dark:text-[#e7ebe6] mb-10">
+          {ar ? "كيف يوصلك طلبك" : "How your order reaches you"}
+        </h2>
+        <ol className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+          {steps.map((step, i) => (
+            <li key={step.title} className="relative ps-0">
+              <div className="flex items-center gap-3 mb-4">
+                <span className="font-display font-bold text-gold text-lg w-10 h-10 rounded-full border-2 border-gold flex items-center justify-center shrink-0">
+                  {ar ? "١٢٣٤"[i] : i + 1}
+                </span>
+                {i < steps.length - 1 && <span aria-hidden="true" className="hidden lg:block h-[2px] flex-1 bg-[repeating-linear-gradient(90deg,#d9480f_0_8px,transparent_8px_14px)] opacity-60" />}
+              </div>
+              <h3 className="font-display font-semibold text-lg text-graphite dark:text-[#e7ebe6] mb-1.5">{step.title}</h3>
+              <p className="text-[#4a5551] dark:text-gray-400 text-[0.95rem]">{step.text}</p>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      {/* للمصممين ولأصحاب الطابعات */}
+      <section className="grid gap-4 md:grid-cols-[1fr_1fr] pb-16">
+        <div className="rounded-3xl bg-[#f6d9c9] dark:bg-[#3a2418] p-7 sm:p-9 flex flex-col">
+          <p className="text-sm font-semibold text-[#8a3208] dark:text-[#f3a77f] mb-3">{ar ? "للمصممين" : "For designers"}</p>
+          <h2 className="font-display font-bold text-2xl sm:text-[1.75rem] text-graphite dark:text-[#f6e6dc] mb-3">
+            {ar ? "ارفع تصميمك مرة، واكسب من كل طباعة" : "Upload once, earn on every print"}
+          </h2>
+          <p className="text-[#4d3426] dark:text-[#e4c9b9] mb-6 max-w-[44ch]">
+            {ar
+              ? "تاخذ ١٠٪ من قيمة المنتج في كل طلب مكتمل. ملفك محمي، وما يحمّله إلا الطابع اللي استلم طلب مدفوع."
+              : "You earn 10% of the product value on every completed order. Your file stays private; only the printer of a paid order can download it."}
+          </p>
+          <Link href="/signup" className="mt-auto self-start bg-graphite text-white px-5 py-3 rounded-xl font-display font-semibold hover:opacity-90">
+            {ar ? "سجّل كمصمم" : "Join as a designer"}
+          </Link>
+        </div>
+        <div className="rounded-3xl bg-graphite text-[#e7ebe6] p-7 sm:p-9 flex flex-col relative overflow-hidden">
+          <span aria-hidden="true" className="absolute inset-x-0 bottom-0 h-24 opacity-[0.12] bg-[repeating-linear-gradient(0deg,#e7ebe6_0_3px,transparent_3px_9px)]" />
+          <p className="text-sm font-semibold text-[#f3a77f] mb-3">{ar ? "لأصحاب الطابعات" : "For printer owners"}</p>
+          <h2 className="font-display font-bold text-2xl sm:text-[1.75rem] mb-3">
+            {ar ? "عندك طابعة؟ خلها تشتغل لك" : "Own a printer? Put it to work"}
+          </h2>
+          <p className="text-[#b9c2bd] mb-6 max-w-[44ch]">
+            {ar
+              ? "تشوف طلبات التسعير، تحمّل الملف وتقيّمه، وترسل سعرك. ما تبدأ الطباعة إلا بعد ما يدفع الزبون، وشركة الشحن تستلم من عندك."
+              : "See quote requests, download and assess the file, and send your price. You print only after the customer pays, and the courier picks up from you."}
+          </p>
+          <Link href="/signup" className="relative mt-auto self-start bg-gold text-white px-5 py-3 rounded-xl font-display font-semibold hover:bg-[#bf3e0b]">
+            {ar ? "سجّل كصاحب طابعة" : "Join as a printer owner"}
+          </Link>
+        </div>
+      </section>
+
+      {/* أسئلة شائعة */}
+      <section aria-labelledby="faq-title" className="grid gap-8 md:grid-cols-[0.8fr_1.2fr] py-14 border-t border-line dark:border-[#323b37]">
+        <div>
+          <h2 id="faq-title" className="font-display font-bold text-2xl sm:text-3xl text-graphite dark:text-[#e7ebe6] mb-4">
+            {ar ? "أسئلة شائعة" : "Common questions"}
+          </h2>
+          <p className="text-[#4a5551] dark:text-gray-400 text-[0.95rem] max-w-[40ch]">
+            {ar
+              ? "Savana3D منصة سعودية للطباعة الثلاثية الأبعاد، تجمع الزبون والمصمم وصاحب الطابعة في شبكة وحدة."
+              : "Savana3D is a Saudi 3D printing platform that brings customers, designers and printer owners into one network."}
+          </p>
+        </div>
+        <div className="divide-y divide-line dark:divide-[#323b37] border-y border-line dark:border-[#323b37]">
+          {faqs.map((faq) => (
+            <details key={faq.q} className="group py-5">
+              <summary className="flex cursor-pointer list-none items-start justify-between gap-4 font-display font-semibold text-graphite dark:text-[#e7ebe6]">
+                <span>{faq.q}</span>
+                <span aria-hidden="true" className="text-gold text-xl leading-none transition-transform group-open:rotate-45">+</span>
+              </summary>
+              <p className="mt-3 text-[#4a5551] dark:text-gray-400 max-w-[60ch]">{faq.a}</p>
+            </details>
+          ))}
+        </div>
+      </section>
 
         <script
           type="application/ld+json"
@@ -190,7 +209,6 @@ export default function Home() {
             }),
           }}
         />
-      </div>
     </>
   );
 }

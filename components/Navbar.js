@@ -95,39 +95,45 @@ export default function Navbar() {
 
   return (
     <nav
-      className={`sticky top-0 z-40 bg-navy text-white transition-shadow duration-200 ${
-        scrolled ? "shadow-lg" : "shadow-sm"
+      className={`sticky top-0 z-40 bg-bed/85 dark:bg-[#121715]/85 backdrop-blur-md text-graphite dark:text-[#e7ebe6] border-b transition-colors duration-200 ${
+        scrolled ? "border-line dark:border-[#323b37]" : "border-transparent"
       }`}
     >
-      <div className="max-w-5xl mx-auto px-3 sm:px-4 py-3 flex items-center gap-2">
-        <Link href="/" className="flex items-center gap-2 font-bold text-base sm:text-lg flex-shrink-0 whitespace-nowrap">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex items-center gap-3 sm:gap-5">
+        <Link href="/" className="flex items-center gap-2 font-display font-bold text-lg flex-shrink-0 whitespace-nowrap">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/logo.png" alt="Savana3D" className="h-8 w-8 sm:h-9 sm:w-9 object-contain flex-shrink-0" />
-          <span className="hidden xs:inline">Savana3D</span>
+          <span className="hidden sm:inline">Savana3D</span>
         </Link>
 
         <div
-          className="flex items-center gap-3 text-sm sm:text-base flex-1 min-w-0 overflow-x-auto"
+          className="flex items-center gap-4 sm:gap-6 text-[0.95rem] font-medium flex-1 min-w-0 overflow-x-auto"
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
-          <Link href="/store" className="hover:text-gold whitespace-nowrap flex-shrink-0">
+          <Link href="/store" className="hover:text-gold whitespace-nowrap flex-shrink-0 py-1">
             {t("nav_store")}
           </Link>
 
           {user && profile?.role === "designer" && (
-            <Link href="/upload" className="hover:text-gold whitespace-nowrap flex-shrink-0">
+            <Link href="/upload" className="hover:text-gold whitespace-nowrap flex-shrink-0 py-1">
               {t("nav_upload")}
             </Link>
           )}
 
           {user && profile?.role === "customer" && (
-            <Link href="/custom-order" className="hover:text-gold whitespace-nowrap flex-shrink-0">
+            <Link href="/custom-order" className="hover:text-gold whitespace-nowrap flex-shrink-0 py-1">
               {t("nav_custom_order")}
             </Link>
           )}
 
+          {user && ["customer", "printer"].includes(profile?.role) && (
+            <Link href="/quotes" className="hover:text-gold whitespace-nowrap flex-shrink-0 py-1">
+              {lang === "en" ? "Quotes" : "عروض الطباعة"}
+            </Link>
+          )}
+
           {!user && (
-            <Link href="/login" className="hover:text-gold whitespace-nowrap flex-shrink-0">
+            <Link href="/login" className="hover:text-gold whitespace-nowrap flex-shrink-0 py-1">
               {t("nav_login")}
             </Link>
           )}
@@ -140,7 +146,7 @@ export default function Navbar() {
             <path d="M2 3h2l2.4 12.2a2 2 0 0 0 2 1.6h8.8a2 2 0 0 0 2-1.6L21 7H6" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
           {cartCount > 0 && (
-            <span className={`absolute -top-2 ${lang === "ar" ? "-right-2" : "-left-2"} bg-gold text-navy text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center`}>
+            <span className={`absolute -top-2 ${lang === "ar" ? "-right-2" : "-left-2"} bg-gold text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center`}>
               {cartCount}
             </span>
           )}
@@ -150,7 +156,7 @@ export default function Navbar() {
           {!user ? (
             <Link
               href="/signup"
-              className="bg-teal px-3 py-1.5 rounded-md hover:opacity-90 text-xs sm:text-sm whitespace-nowrap"
+              className="bg-gold text-white px-4 py-2 rounded-xl font-display font-semibold hover:bg-[#bf3e0b] text-sm whitespace-nowrap"
             >
               {t("nav_signup")}
             </Link>
@@ -160,7 +166,7 @@ export default function Navbar() {
                 onClick={() => setMenuOpen((v) => !v)}
                 aria-label={t("nav_menu")}
                 aria-expanded={menuOpen}
-                className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors"
+                className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-graphite/10 dark:hover:bg-white/10 transition-colors"
               >
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
                   <circle cx="5" cy="12" r="2" />

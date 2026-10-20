@@ -4,16 +4,74 @@
 
 html {
   direction: rtl;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
-  font-family: "Tajawal", "Segoe UI", Tahoma, Arial, sans-serif;
-  background-color: #f8f9fb;
-  color: #1a1a1a;
+  font-family: "IBM Plex Sans Arabic", system-ui, "Segoe UI", Tahoma, sans-serif;
+  background-color: #ecEEE9;
+  color: #1c2422;
+  line-height: 1.7;
+  text-rendering: optimizeLegibility;
   transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-@import url("https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap");
+h1, h2, h3, h4 {
+  font-family: "Alexandria", "IBM Plex Sans Arabic", system-ui, sans-serif;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+
+/* تركيز واضح للوحة المفاتيح بكل الموقع */
+:focus-visible {
+  outline: 3px solid #d9480f;
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+::selection {
+  background: #d9480f;
+  color: #fff;
+}
+
+/* البطاقات والحقول: زوايا وحدود هادئة بدل الظلال الثقيلة */
+.bg-white.shadow-sm,
+.bg-white.rounded-2xl,
+.bg-white.rounded-xl {
+  box-shadow: none !important;
+  border: 1px solid #d3d8d0;
+}
+
+input, textarea, select {
+  border-color: #c9cfc6;
+  background-color: #fff;
+}
+
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: #d9480f;
+  box-shadow: 0 0 0 3px rgba(217, 72, 15, 0.15);
+}
+
+/* الأزرار الأساسية تاخذ خط العناوين */
+button.bg-navy, a.bg-navy, button.bg-teal, a.bg-teal, button.bg-gold, a.bg-gold {
+  font-family: "Alexandria", "IBM Plex Sans Arabic", system-ui, sans-serif;
+  font-weight: 600;
+}
+
+/* طبقات المزهرية في الواجهة: تنطبع مرة وحدة عند فتح الصفحة */
+.print-layer {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: layerIn 0.32s cubic-bezier(0.3, 0.7, 0.2, 1) both;
+}
+.print-nozzle {
+  animation: nozzleRun 0.6s ease-in-out 5 both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .print-layer, .print-nozzle { animation: none !important; }
+  * { scroll-behavior: auto !important; }
+}
 
 /* ============================================================
    الوضع الداكن — تطبيق عام يغطي كل صفحات الموقع
@@ -22,25 +80,25 @@ body {
    text-gray-*, border, إلخ) لما تنفعل .dark على <html>
    ============================================================ */
 .dark body {
-  background-color: #0b1220;
+  background-color: #121715;
   color: #e5e7eb;
 }
 
 .dark .bg-white {
-  background-color: #111827 !important;
+  background-color: #1a201e !important;
 }
 
 .dark .bg-gray-50 {
-  background-color: #0b1220 !important;
+  background-color: #121715 !important;
 }
 
 .dark .bg-gray-100,
 .dark .bg-gray-200 {
-  background-color: #1f2937 !important;
+  background-color: #232a27 !important;
 }
 
 .dark .text-navy {
-  color: #93c5fd !important;
+  color: #e7ebe6 !important;
 }
 
 .dark .text-gray-900,
@@ -57,15 +115,15 @@ body {
 .dark .border,
 .dark .border-gray-200,
 .dark .border-gray-300 {
-  border-color: #374151 !important;
+  border-color: #323b37 !important;
 }
 
 .dark input,
 .dark textarea,
 .dark select {
-  background-color: #1f2937 !important;
+  background-color: #232a27 !important;
   color: #e5e7eb !important;
-  border-color: #374151 !important;
+  border-color: #323b37 !important;
 }
 
 .dark input::placeholder,
@@ -77,3 +135,13 @@ body {
 .dark .shadow-md {
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.55) !important;
 }
+
+.dark .bg-white.shadow-sm,
+.dark .bg-white.rounded-2xl,
+.dark .bg-white.rounded-xl {
+  border-color: #323b37;
+}
+.dark .bg-bed { background-color: #121715 !important; }
+.dark .text-teal { color: #4cc2ad !important; }
+.dark .bg-navy { background-color: #e7ebe6 !important; color: #121715 !important; }
+.dark .border-line { border-color: #323b37 !important; }

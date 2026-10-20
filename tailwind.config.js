@@ -1,30 +1,33 @@
 /** @type {import('tailwindcss').Config} */
+// ألوان Savana3D مستوحاة من الطباعة نفسها: سطح الطابعة، الغرافيت، وبرتقالي الفيلامنت.
+// الأسماء القديمة (navy / teal / gold) باقية عشان كل الصفحات تاخذ الهوية الجديدة تلقائيًا.
 module.exports = {
   darkMode: "class",
-  content: [
-    "./pages/**/*.{js,jsx}",
-    "./components/**/*.{js,jsx}",
-  ],
+  content: ["./pages/**/*.{js,jsx}", "./components/**/*.{js,jsx}"],
   theme: {
     extend: {
       colors: {
-        navy: "#1F3864",
-        teal: "#0F6E63",
-        gold: "#9C7A29",
+        navy: "#1C2422",      // غرافيت — النص والأزرار الأساسية
+        teal: "#0E6B5F",      // أخضر الشعار — روابط ونجاح
+        gold: "#D9480F",      // برتقالي الفيلامنت — الإجراء الأهم بكل صفحة
+        bed: "#ECEEE9",       // سطح الطابعة — خلفية الصفحات
+        line: "#D3D8D0",      // خطوط فاصلة هادئة
+        filament: "#D9480F",
+        graphite: "#1C2422",
+      },
+      fontFamily: {
+        display: ["Alexandria", "IBM Plex Sans Arabic", "system-ui", "sans-serif"],
+        sans: ["IBM Plex Sans Arabic", "system-ui", "Segoe UI", "Tahoma", "sans-serif"],
       },
       keyframes: {
-        nozzleSway: {
-          "0%, 100%": { transform: "translateX(-6px)" },
-          "50%": { transform: "translateX(6px)" },
+        layerIn: {
+          "0%": { transform: "scaleX(0)" },
+          "100%": { transform: "scaleX(1)" },
         },
-        layerRise: {
-          "0%": { opacity: "0.35", transform: "scaleY(0.9)" },
-          "100%": { opacity: "1", transform: "scaleY(1)" },
+        nozzleRun: {
+          "0%, 100%": { transform: "translateX(-38px)" },
+          "50%": { transform: "translateX(38px)" },
         },
-      },
-      animation: {
-        "nozzle-sway": "nozzleSway 2.8s ease-in-out infinite",
-        "layer-rise": "layerRise 1.4s ease-out infinite alternate",
       },
     },
   },

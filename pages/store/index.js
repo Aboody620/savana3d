@@ -80,66 +80,10 @@ export default function Store() {
         <link rel="canonical" href="https://savana3d.com/store" />
       </Head>
 
-      {/* Hero: طبقات طباعة + رأس الطابعة + بكرة الفلامنت */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-navy via-navy to-teal px-6 py-12 sm:py-16 mb-6 text-center">
-        <div
-          className="pointer-events-none absolute inset-0"
-          style={{
-            backgroundImage:
-              "radial-gradient(circle at 20% 20%, #ffffff 0, transparent 35%), radial-gradient(circle at 80% 60%, #9C7A29 0, transparent 40%)",
-            opacity: 0.2,
-          }}
-        />
-
-        <div className="relative">
-          <h1 className="text-2xl sm:text-4xl font-black text-white mb-3">{t("store_title")}</h1>
-          <p className="text-white/85 max-w-xl mx-auto text-sm sm:text-base">{t("store_subtitle")}</p>
-        </div>
-      </div>
-
-      {/* شريط الخطوات الثلاث */}
-      <div className="grid grid-cols-3 sm:flex sm:items-stretch sm:justify-between gap-3 sm:gap-4 mb-8 bg-white rounded-2xl shadow-sm border border-gray-100 px-3 sm:px-6 py-4">
-        {[t("process_step1"), t("process_step2"), t("process_step3")].map((label, i) => (
-          <div key={i} className="flex flex-col sm:flex-row items-center sm:flex-1 sm:min-w-0 text-center sm:text-right">
-            <div className="flex flex-col sm:flex-row items-center sm:gap-3 gap-1.5 min-w-0 w-full">
-              <span className="shrink-0 h-7 w-7 sm:h-8 sm:w-8 rounded-full bg-navy text-white text-xs sm:text-sm font-bold flex items-center justify-center">
-                {i + 1}
-              </span>
-              <span className="text-[11px] sm:text-sm font-bold text-navy leading-tight sm:truncate">{label}</span>
-            </div>
-            {i < 2 && (
-              <span className="hidden sm:block flex-1 h-px bg-gray-200 mx-3" aria-hidden="true" />
-            )}
-          </div>
-        ))}
-      </div>
-
-      {/* شريط الثقة */}
-      <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 mb-8 text-[11px] sm:text-xs text-gray-500">
-        <div className="flex items-center gap-1.5">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-teal">
-            <path d="M3 3h13v13H3z" />
-            <path d="M16 8h4l1 5v3h-5V8Z" />
-            <circle cx="7.5" cy="18.5" r="1.8" />
-            <circle cx="17.5" cy="18.5" r="1.8" />
-          </svg>
-          <span>{t("trust_delivery")}</span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-teal">
-            <rect x="2" y="5" width="20" height="14" rx="2" />
-            <path d="M2 10h20" />
-          </svg>
-          <span>{t("trust_payment")}</span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-teal">
-            <circle cx="12" cy="8" r="4" />
-            <path d="M4 21c0-4 3.5-6 8-6s8 2 8 6" />
-          </svg>
-          <span>{t("trust_network")}</span>
-        </div>
-      </div>
+      <header className="pt-2 pb-8">
+        <h1 className="font-display font-extrabold text-[2rem] sm:text-5xl leading-tight text-graphite dark:text-[#e7ebe6] mb-3">{t("store_title")}</h1>
+        <p className="text-[#4a5551] dark:text-gray-400 max-w-[52ch] text-base sm:text-lg">{t("store_subtitle")}</p>
+      </header>
 
       {/* تصنيفات قابلة للفلترة */}
       <div className="flex gap-2 overflow-x-auto pb-1 mb-5 -mx-1 px-1">
@@ -147,10 +91,10 @@ export default function Store() {
           <button
             key={c.slug}
             onClick={() => setCategory(c.slug)}
-            className={`shrink-0 flex items-center gap-1.5 rounded-full px-4 py-2 text-xs sm:text-sm font-bold border transition-colors ${
+            className={`shrink-0 flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold border transition-colors ${
               category === c.slug
-                ? "bg-navy text-white border-navy"
-                : "bg-white text-navy border-gray-200 hover:border-navy/40"
+                ? "bg-graphite text-white border-graphite dark:bg-[#e7ebe6] dark:text-[#121715]"
+                : "bg-transparent text-graphite dark:text-[#e7ebe6] border-line dark:border-[#323b37] hover:border-graphite"
             }`}
           >
             <span>{c.icon}</span>
@@ -179,14 +123,14 @@ export default function Store() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder={t("store_search_placeholder") || (lang === "ar" ? "دوّر عن تصميم..." : "Search designs...")}
-            className="w-full rounded-xl border border-gray-200 bg-white pr-10 pl-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal/40 focus:border-teal text-right"
+            className="w-full rounded-xl border border-gray-200 bg-white pr-10 pl-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30 focus:border-gold text-right"
           />
         </div>
 
         <select
           value={sort}
           onChange={(e) => setSort(e.target.value)}
-          className="rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal/40 focus:border-teal"
+          className="rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gold/30 focus:border-gold"
         >
           <option value="newest">{lang === "ar" ? "الأحدث" : "Newest"}</option>
           <option value="price_asc">{lang === "ar" ? "السعر: من الأقل" : "Price: Low to High"}</option>
@@ -240,20 +184,20 @@ export default function Store() {
           {filtered.map((d) => {
             const techParts = [];
             if (d.print_time_hours) {
-              techParts.push(`⏱️ ${t("card_print_time")}: ${d.print_time_hours} ${t("card_hours")}`);
+              techParts.push(`${d.print_time_hours} ${t("card_hours")}`);
             }
             if (d.material) {
-              techParts.push(`🧵 ${t("card_material")}: ${d.material}`);
+              techParts.push(d.material);
             }
-            techParts.push(`🎨 ${d.multi_color ? t("card_colors_multi") : t("card_colors_one")}`);
+            if (d.multi_color) techParts.push(t("card_colors_multi"));
 
             return (
               <Link
                 key={d.id}
                 href={`/store/${d.id}`}
-                className="group bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-200 flex flex-col"
+                className="group bg-white dark:bg-[#1a201e] rounded-2xl border border-line dark:border-[#323b37] overflow-hidden hover:border-graphite/50 dark:hover:border-[#e7ebe6]/40 transition-colors flex flex-col"
               >
-                <div className="relative aspect-square bg-[#EEF2F6] overflow-hidden">
+                <div className="relative aspect-square bg-[#e2e6df] dark:bg-[#232a27] overflow-hidden">
                   {d.preview_image_url ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
@@ -261,35 +205,35 @@ export default function Store() {
                       alt={d.title}
                       loading="lazy"
                       decoding="async"
-                      className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      className="h-full w-full object-cover"
                     />
                   ) : (
                     <div className="h-full w-full flex items-center justify-center text-gray-300 text-sm">
                       {t("store_no_preview")}
                     </div>
                   )}
-                  <span className="absolute top-2 left-2 bg-white/90 backdrop-blur text-navy text-xs font-bold px-2 py-1 rounded-lg shadow-sm">
-                    {d.pricing_mode === "quote" ? (lang === "ar" ? "السعر حسب الطلب" : "Price on request") : `${d.price} ${t("riyal")}`}
-                  </span>
                 </div>
                 <div className="p-3 md:p-4 flex flex-col flex-1">
-                  <h3 className="font-bold text-navy text-sm md:text-base leading-snug line-clamp-2 mb-1.5">
+                  <h3 className="font-display font-semibold text-graphite dark:text-[#e7ebe6] text-[0.95rem] md:text-base leading-snug line-clamp-2 mb-1">
                     {d.title}
                   </h3>
-                  <p className="text-[11px] md:text-xs text-gray-500 leading-relaxed mb-3">
+                  <p className="font-display font-bold text-gold text-base md:text-lg mb-1.5">
+                    {d.pricing_mode === "quote" ? (lang === "ar" ? "السعر حسب الطلب" : "Price on request") : `${d.price} ${t("riyal")}`}
+                  </p>
+                  <p className="text-[11px] md:text-xs text-[#5d6864] dark:text-gray-400 leading-relaxed mb-3">
                     {techParts.join(" · ")}
                   </p>
                   {d.pricing_mode === "quote" ? (
-                    <span className="mt-auto w-full text-center text-xs md:text-sm font-bold py-2 rounded-lg bg-teal/10 text-teal">
+                    <span className="mt-auto w-full text-center text-xs md:text-sm font-semibold py-2.5 rounded-xl bg-gold/10 text-gold">
                       {lang === "ar" ? "اطلب سعر الطباعة" : "Request a quote"}
                     </span>
                   ) : (
                   <button
                     onClick={(e) => handleAdd(e, d)}
-                    className={`mt-auto w-full text-xs md:text-sm font-bold py-2 rounded-lg transition-colors ${
+                    className={`mt-auto w-full text-xs md:text-sm font-semibold py-2.5 rounded-xl transition-colors ${
                       addedId === d.id
                         ? "bg-teal text-white"
-                        : "bg-navy/5 text-navy hover:bg-navy hover:text-white"
+                        : "border border-graphite/70 text-graphite dark:text-[#e7ebe6] dark:border-[#e7ebe6]/50 hover:bg-graphite hover:text-white"
                     }`}
                   >
                     {addedId === d.id ? t("store_added") : t("store_add_to_cart")}
