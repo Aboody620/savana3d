@@ -270,6 +270,12 @@ export default function Cart() {
             <p className="text-sm text-gray-600 mb-4">
               {t("cart_amount_due")}: <span className="font-bold text-navy">{Number(activeCheckout.total).toFixed(2)} {t("riyal")}</span>
             </p>
+            <p className="text-xs text-gray-500 mb-3">
+              {lang === "en" ? "By paying you agree to the " : "بإتمام الدفع أنت توافق على "}
+              <a href="/terms" className="underline">{lang === "en" ? "terms" : "الشروط والأحكام"}</a>
+              {lang === "en" ? " and " : " و"}
+              <a href="/refund" className="underline">{lang === "en" ? "refund policy" : "سياسة الاسترجاع"}</a>.
+            </p>
             <div className="mysr-form"></div>
           </div>
         )}

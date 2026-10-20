@@ -4,6 +4,7 @@ import Navbar from "../components/Navbar";
 import { ThemeProvider } from "../lib/ThemeContext";
 import { LanguageProvider, useLanguage } from "../lib/LanguageContext";
 import { getT } from "../lib/translations";
+import { BUSINESS } from "../lib/businessInfo";
 
 function AppShell({ Component, pageProps }) {
   const { dir, lang } = useLanguage();
@@ -35,6 +36,9 @@ function AppShell({ Component, pageProps }) {
               <li><a href="/custom-order" className="hover:text-white">{t("nav_custom_order")}</a></li>
               <li><a href="/signup" className="hover:text-white">{t("nav_signup")}</a></li>
               <li><a href="/login" className="hover:text-white">{t("nav_login")}</a></li>
+              <li><a href="/terms" className="hover:text-white">الشروط والأحكام</a></li>
+              <li><a href="/privacy" className="hover:text-white">سياسة الخصوصية</a></li>
+              <li><a href="/refund" className="hover:text-white">الاسترجاع والاستبدال</a></li>
             </ul>
           </nav>
           <div>
@@ -45,7 +49,8 @@ function AppShell({ Component, pageProps }) {
           </div>
         </div>
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-5 border-t border-white/10 text-xs text-[#8f9a95]">
-          © {new Date().getFullYear()} Savana3D · {t("footer_rights")}
+          <p>© {new Date().getFullYear()} Savana3D · {t("footer_rights")}</p>
+          <p className="mt-1">وثيقة عمل حر <span dir="ltr">{BUSINESS.freelanceDocument}</span> · توثيق المركز السعودي للأعمال <span dir="ltr">{BUSINESS.businessCenterAuth}</span> · الدفع عبر ميسر: مدى، فيزا، ماستركارد</p>
         </div>
       </footer>
     </div>
