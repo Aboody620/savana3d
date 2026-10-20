@@ -42,8 +42,16 @@ export default function Admin() {
   }, [user]);
 
   if (loading || (user && isAdmin === null)) return <p className="text-center py-20">جاري التحميل…</p>;
-  if (!user) return <p className="text-center py-20"><Link href="/login" className="text-gold font-semibold">سجّل الدخول</Link></p>;
-  if (!isAdmin) return <p className="text-center py-20">هذي الصفحة لصاحب المتجر فقط.</p>;
+  // لغير صاحب المتجر: تظهر كأنها صفحة غير موجودة (الحماية الفعلية في قاعدة البيانات)
+  if (!user || !isAdmin) {
+    return (
+      <div className="py-24 text-center">
+        <Head><title>الصفحة غير موجودة | Savana3D</title><meta name="robots" content="noindex,nofollow" /></Head>
+        <p className="font-bold text-2xl mb-3">الصفحة غير موجودة</p>
+        <Link href="/store" className="text-gold font-semibold">ارجع للمتجر</Link>
+      </div>
+    );
+  }
 
   return (
     <div dir="rtl">
