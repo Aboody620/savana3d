@@ -49,7 +49,7 @@ export default function HeroVideo({ lang = "ar" }) {
         </p>
         <Link
           href="/store"
-          className="mt-9 inline-flex items-center gap-3 rounded-full bg-white text-black px-9 py-4 font-semibold hover:bg-white/90 transition-colors"
+          className="mt-9 inline-flex items-center gap-3 rounded-full bg-[#ffffff] text-[#000000] px-9 py-4 font-semibold hover:opacity-90 transition-opacity"
         >
           {ar ? "تسوّق الآن" : "Shop now"}
           <span aria-hidden="true">{ar ? "←" : "→"}</span>
