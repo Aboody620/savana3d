@@ -4,6 +4,7 @@ import Link from "next/link";
 import { supabase } from "../lib/supabaseClient";
 import { useLanguage } from "../lib/LanguageContext";
 import ProductCard, { visibleDesigns } from "../components/ProductCard";
+import HeroVideo from "../components/HeroVideo";
 
 export default function Home() {
   const { lang } = useLanguage();
@@ -19,12 +20,10 @@ export default function Home() {
       .then(({ data }) => setDesigns(visibleDesigns(data).slice(0, 8)));
   }, []);
 
-  const hero = designs?.[0];
-
   return (
     <>
       <Head>
-        <title>Savana3D | قطع مطبوعة ثلاثية الأبعاد</title>
+        <title>Savana3D | من الفكرة إلى قطعة بين يديك</title>
         <meta name="description" content="ديكورات وهدايا مطبوعة بتقنية ثلاثية الأبعاد، تنطبع لك خصيصًا وتوصلك لبابك." />
         <link rel="canonical" href="https://savana3d.com/" />
         <meta property="og:site_name" content="Savana3D" />
@@ -36,30 +35,10 @@ export default function Home() {
         <meta name="twitter:card" content="summary_large_image" />
       </Head>
 
-      {/* الواجهة: جملة واحدة وصورة كبيرة */}
-      <section className="grid items-center gap-8 md:gap-16 md:grid-cols-2 pt-2 pb-16 md:pt-10 md:pb-24">
-        <div className="order-2 md:order-1">
-          <h1 className="text-[2.6rem] leading-[1.15] sm:text-6xl md:text-[4.2rem] md:leading-[1.08] font-semibold tracking-tightest text-ink dark:text-[#F2F2EF]">
-            {ar ? <>قطع مطبوعة،<br />بتفاصيل تستاهل.</> : <>Printed pieces,<br />made with care.</>}
-          </h1>
-          <p className="mt-5 text-lg text-muted max-w-[34ch]">
-            {ar ? "تنطبع لك خصيصًا، وتوصلك لبابك." : "Printed for you, delivered to your door."}
-          </p>
-          <Link href="/store" className="mt-9 inline-flex items-center gap-3 rounded-full bg-ink text-white px-8 py-4 font-semibold hover:opacity-85 transition-opacity">
-            {ar ? "تسوّق الآن" : "Shop now"}
-            <span aria-hidden="true">{ar ? "←" : "→"}</span>
-          </Link>
-        </div>
-        <Link href={hero ? `/store/${hero.id}` : "/store"} className="order-1 md:order-2 block aspect-[4/5] md:aspect-square rounded-[28px] overflow-hidden bg-stone dark:bg-[#222220]" aria-label={hero?.title || (ar ? "المتجر" : "Store")}>
-          {hero?.preview_image_url && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={hero.preview_image_url} alt={hero.title} className="h-full w-full object-cover" />
-          )}
-        </Link>
-      </section>
+      <HeroVideo lang={lang} />
 
       {/* الجديد */}
-      {designs && designs.length > 1 && (
+      {designs && designs.length > 0 && (
         <section className="pb-20">
           <div className="flex items-baseline justify-between mb-6">
             <h2 className="text-2xl font-semibold text-ink dark:text-[#F2F2EF]">{ar ? "الجديد" : "New in"}</h2>
@@ -68,7 +47,7 @@ export default function Home() {
             </Link>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-10">
-            {designs.slice(1, 9).map((d, i) => <ProductCard key={d.id} design={d} lang={lang} eager={i < 4} />)}
+            {designs.slice(0, 8).map((d, i) => <ProductCard key={d.id} design={d} lang={lang} eager={i < 4} />)}
           </div>
         </section>
       )}

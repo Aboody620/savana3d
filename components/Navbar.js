@@ -23,7 +23,7 @@ export default function Navbar() {
 
   useEffect(() => {
     function onScroll() {
-      setScrolled(window.scrollY > 8);
+      setScrolled(window.scrollY > 40);
     }
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -59,10 +59,16 @@ export default function Navbar() {
     router.push("/");
   }
 
+  // في الصفحة الرئيسية: الشريط شفاف فوق الفيديو لين ينزل الزائر
+  const isHome = router.pathname === "/";
+  const overlay = isHome && !scrolled && !menuOpen;
+
   return (
     <nav
-      className={`sticky top-0 z-40 bg-bed/85 dark:bg-[#0E0E0D]/85 backdrop-blur-md text-graphite dark:text-[#F2F2EF] border-b transition-colors duration-200 ${
-        scrolled ? "border-line dark:border-[#2E2E2B]" : "border-transparent"
+      className={`${isHome ? "fixed inset-x-0" : "sticky"} top-0 z-40 border-b transition-colors duration-300 ${
+        overlay
+          ? "bg-transparent text-white border-transparent"
+          : `bg-bed/85 dark:bg-[#0E0E0D]/85 backdrop-blur-md text-graphite dark:text-[#F2F2EF] ${scrolled ? "border-line dark:border-[#2E2E2B]" : "border-transparent"}`
       }`}
     >
       <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center gap-4 sm:gap-6">
